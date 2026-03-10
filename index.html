@@ -1,452 +1,1250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Animesh Sitoula — Cybersecurity & Python Developer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --bg: #070b0f;
-      --bg2: #0d1117;
-      --bg3: #111820;
-      --green: #00ff88;
-      --cyan: #00d4ff;
-      --red: #ff3c5a;
-      --text: #c9d1d9;
-      --muted: #556070;
-      --border: #1e2d3d;
-      --card: #0d1520;
-      --glow: 0 0 20px rgba(0,255,136,0.15);
+      --bg:#070b0f; --bg2:#0d1117; --bg3:#111820;
+      --green:#00ff88; --cyan:#00d4ff; --red:#ff3c5a;
+      --text:#c9d1d9; --muted:#556070; --border:#1e2d3d;
+      --card:#0d1520; --glow:0 0 20px rgba(0,255,136,0.15);
     }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    html,body,*{cursor:none!important;}
+    body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden;}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    html, body, * { cursor: none !important; }
+    /* CROSSHAIR */
+    #cur{position:fixed;pointer-events:none;z-index:999999;left:0;top:0;transform:translate(-50%,-50%);}
+    #cur .ch-h{position:absolute;width:28px;height:1px;background:var(--green);top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 6px var(--green);}
+    #cur .ch-v{position:absolute;width:1px;height:28px;background:var(--green);top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 6px var(--green);}
+    #cur .ch-c{position:absolute;width:4px;height:4px;background:var(--green);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--green),0 0 20px rgba(0,255,136,0.5);}
+    #cur .gl{position:absolute;background:var(--bg);}
+    #cur .gl-l{width:7px;height:1px;top:50%;left:calc(50% - 14px);transform:translateY(-50%);}
+    #cur .gl-r{width:7px;height:1px;top:50%;left:calc(50% + 7px);transform:translateY(-50%);}
+    #cur .gl-t{width:1px;height:7px;left:50%;top:calc(50% - 14px);transform:translateX(-50%);}
+    #cur .gl-b{width:1px;height:7px;left:50%;top:calc(50% + 7px);transform:translateX(-50%);}
+    #cur-ring{position:fixed;width:44px;height:44px;border:1px solid rgba(0,255,136,0.3);border-radius:2px;pointer-events:none;z-index:999998;left:0;top:0;transform:translate(-50%,-50%) rotate(45deg);transition:width .15s,height .15s,border-color .15s;}
+    body.chover #cur-ring{width:56px;height:56px;border-color:rgba(0,255,136,0.6);}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      overflow-x: hidden;
-    }
+    ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--green);}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,0.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
 
-    /* ===== CURSOR ===== */
-    #gCursor {
-      position: fixed;
-      width: 12px; height: 12px;
-      background: #00ff88;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 999999;
-      left: -40px; top: -40px;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 8px 2px #00ff88, 0 0 20px 6px rgba(0,255,136,0.4);
-    }
-    #gRing {
-      position: fixed;
-      width: 36px; height: 36px;
-      border: 1.5px solid rgba(0,255,136,0.55);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 999998;
-      left: -40px; top: -40px;
-      transform: translate(-50%, -50%);
-    }
+    /* SIDENAV */
+    .sidenav{position:fixed;left:0;top:0;bottom:0;width:220px;background:rgba(7,11,15,0.93);backdrop-filter:blur(16px);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;padding:2.5rem 0;}
+    .sidenav-logo{font-family:'Share Tech Mono',monospace;font-size:1rem;color:var(--green);letter-spacing:2px;padding:0 2rem 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+    .sidenav-logo span{color:var(--cyan);}
+    .sidenav-logo small{display:block;font-size:0.6rem;color:var(--muted);letter-spacing:3px;margin-top:4px;}
+    .sidenav-links{list-style:none;flex:1;display:flex;flex-direction:column;gap:2px;padding:0 1rem;}
+    .sidenav-links li a{display:flex;align-items:center;gap:10px;font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:var(--muted);text-decoration:none;letter-spacing:1px;padding:0.7rem 1rem;border-radius:2px;transition:all 0.2s;}
+    .sidenav-links li a .nn{color:var(--green);font-size:0.6rem;opacity:0.6;}
+    .sidenav-links li a:hover{color:var(--text);background:rgba(0,255,136,0.05);padding-left:1.4rem;}
+    .sidenav-links li a:hover .nn{opacity:1;}
+    .sidenav-links li a.active{color:var(--green);background:rgba(0,255,136,0.06);border-left:2px solid var(--green);}
+    .sidenav-footer{padding:1.5rem 2rem 0;border-top:1px solid var(--border);font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1px;line-height:1.8;}
+    .sdot{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+    .sdot-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s ease infinite;}
+    @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--green); border-radius: 2px; }
+    /* MAIN */
+    .main{margin-left:220px;position:relative;z-index:1;}
 
-    /* Background grid */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none; z-index: 0;
+    /* HERO — new layout: big name + tech stack left, skills panel + ongoing right */
+    .hero{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:1fr 380px;
+      gap:3rem;
+      align-items:start;
+      padding:7rem 4rem 5rem 5rem;
+      position:relative;
     }
+    .hero-left{}
+    .hero-badge{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--green);letter-spacing:4px;display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;animation:fadeUp 0.6s ease both;}
+    .hero-badge::before{content:'';width:30px;height:1px;background:var(--green);}
+    .blink{animation:blink 1s step-end infinite;}
+    @keyframes blink{50%{opacity:0;}}
+    .hero h1{font-size:clamp(3.5rem,5.5vw,6rem);font-weight:800;line-height:0.92;letter-spacing:-3px;margin-bottom:1.2rem;animation:fadeUp 0.6s 0.1s ease both;}
+    .hero h1 .name-line{display:block;}
+    .hero h1 .highlight{color:transparent;-webkit-text-stroke:1.5px var(--green);}
+    .hero-role{font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:var(--cyan);letter-spacing:3px;margin-bottom:1.6rem;animation:fadeUp 0.6s 0.2s ease both;}
+    .hero-desc{max-width:480px;line-height:1.85;color:var(--muted);font-size:0.92rem;margin-bottom:2rem;animation:fadeUp 0.6s 0.3s ease both;}
+    .hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2.5rem;animation:fadeUp 0.6s 0.4s ease both;}
+    .btn{font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:2px;padding:0.82rem 1.8rem;text-decoration:none;border-radius:2px;transition:all 0.25s;display:inline-block;}
+    .btn-primary{background:var(--green);color:var(--bg);font-weight:bold;}
+    .btn-primary:hover{background:transparent;color:var(--green);box-shadow:inset 0 0 0 1px var(--green),var(--glow);}
+    .btn-outline{border:1px solid var(--border);color:var(--text);}
+    .btn-outline:hover{border-color:var(--cyan);color:var(--cyan);}
 
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.2rem 4rem;
-      background: rgba(7,11,15,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo { font-family: 'Share Tech Mono', monospace; font-size: 1.1rem; color: var(--green); letter-spacing: 2px; }
-    .nav-logo span { color: var(--cyan); }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a {
-      font-family: 'Share Tech Mono', monospace; font-size: 0.8rem;
-      color: var(--muted); text-decoration: none; letter-spacing: 1px; transition: color 0.2s; position: relative;
-    }
-    .nav-links a::before { content: '//'; color: var(--green); margin-right: 5px; opacity: 0; transition: opacity 0.2s; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a:hover::before { opacity: 1; }
+    /* Tech stack mini in hero */
+    .hero-stack{animation:fadeUp 0.6s 0.5s ease both;}
+    .hero-stack-label{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--muted);letter-spacing:3px;margin-bottom:0.7rem;}
+    .hero-stack-tags{display:flex;flex-wrap:wrap;gap:0.4rem;}
+    .stack-tag{font-family:'Share Tech Mono',monospace;font-size:0.65rem;padding:0.22rem 0.6rem;border-radius:2px;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.12);color:var(--text);letter-spacing:1px;transition:all 0.15s;}
+    .stack-tag:hover{background:rgba(0,255,136,0.1);border-color:rgba(0,255,136,0.4);}
 
-    /* HERO */
-    .hero {
-      min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
-      padding: 8rem 4rem 4rem; position: relative; z-index: 1; max-width: 1100px; margin: 0 auto;
-    }
-    .hero-badge {
-      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--green);
-      letter-spacing: 3px; display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem;
-      animation: fadeUp 0.6s ease both;
-    }
-    .hero-badge::before { content: ''; width: 40px; height: 1px; background: var(--green); }
-    .blink { animation: blink 1s step-end infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-    .hero h1 {
-      font-size: clamp(3rem, 8vw, 6.5rem); font-weight: 800; line-height: 0.95;
-      letter-spacing: -2px; margin-bottom: 1rem; animation: fadeUp 0.6s 0.1s ease both;
-    }
-    .hero h1 .name-line { display: block; }
-    .hero h1 .highlight { color: transparent; -webkit-text-stroke: 1.5px var(--green); }
-    .hero-role { font-family: 'Share Tech Mono', monospace; font-size: 1rem; color: var(--cyan); letter-spacing: 2px; margin-bottom: 2rem; animation: fadeUp 0.6s 0.2s ease both; }
-    .hero-desc { max-width: 600px; line-height: 1.8; color: var(--muted); font-size: 1rem; margin-bottom: 3rem; animation: fadeUp 0.6s 0.3s ease both; }
-    .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.4s ease both; }
-    .btn { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 2px; padding: 0.9rem 2rem; text-decoration: none; border-radius: 2px; transition: all 0.25s; }
-    .btn-primary { background: var(--green); color: var(--bg); font-weight: bold; }
-    .btn-primary:hover { background: transparent; color: var(--green); box-shadow: inset 0 0 0 1px var(--green), var(--glow); }
-    .btn-outline { border: 1px solid var(--border); color: var(--text); }
-    .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 15px rgba(0,212,255,0.1); }
+    /* Hero right panel */
+    .hero-right{display:flex;flex-direction:column;gap:1.5rem;padding-top:1rem;animation:fadeUp 0.6s 0.4s ease both;}
 
-    /* Terminal */
-    .terminal {
-      position: absolute; right: 4rem; top: 50%; transform: translateY(-50%);
-      background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; width: 340px;
-      font-family: 'Share Tech Mono', monospace; font-size: 0.78rem;
-      overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); animation: fadeUp 0.6s 0.5s ease both;
-    }
-    .terminal-bar { background: var(--bg3); padding: 0.6rem 1rem; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-r { background: #ff5f57; } .dot-y { background: #febc2e; } .dot-g { background: #28c840; }
-    .terminal-title { color: var(--muted); font-size: 0.7rem; margin-left: auto; }
-    .terminal-body { padding: 1.2rem; line-height: 2; }
-    .t-prompt { color: var(--green); } .t-cmd { color: var(--text); }
-    .t-output { color: var(--muted); padding-left: 1rem; }
-    .t-highlight { color: var(--cyan); } .t-warn { color: var(--red); }
+    /* Proficiency panel */
+    .panel{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:1.4rem;}
+    .panel-title{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--green);letter-spacing:4px;margin-bottom:1.4rem;display:flex;align-items:center;gap:8px;}
+    .panel-title::after{content:'';flex:1;height:1px;background:rgba(0,255,136,0.18);}
 
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .skill-bar-item{margin-bottom:1.15rem;}
+    .skill-bar-item:last-child{margin-bottom:0;}
+    .skill-bar-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;}
+    .skill-bar-name{font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text);letter-spacing:1px;}
+    .skill-bar-meta{display:flex;align-items:center;gap:8px;}
+    .skill-bar-pct{font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--green);background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.18);padding:1px 6px;border-radius:2px;min-width:40px;text-align:center;}
+    .skill-bar-level{font-family:'Share Tech Mono',monospace;font-size:0.55rem;letter-spacing:1px;color:var(--muted);}
+    .skill-bar-track{height:7px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.05);border-radius:1px;position:relative;overflow:hidden;}
+    .skill-bar-track::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,0.06) 0px,rgba(255,255,255,0.06) 1px,transparent 1px,transparent 25%);background-size:25% 100%;z-index:2;pointer-events:none;}
+    .skill-bar-fill{position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:1px;transition:width 1.6s cubic-bezier(0.16,1,0.3,1);}
+    .skill-bar-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:3px;background:white;opacity:0.7;filter:blur(1px);}
+    .fill-green{background:linear-gradient(90deg,rgba(0,255,136,0.45),var(--green));box-shadow:0 0 10px rgba(0,255,136,0.3);}
+    .fill-cyan{background:linear-gradient(90deg,rgba(0,212,255,0.45),var(--cyan));box-shadow:0 0 10px rgba(0,212,255,0.3);}
+    .fill-red{background:linear-gradient(90deg,rgba(255,60,90,0.45),var(--red));box-shadow:0 0 10px rgba(255,60,90,0.3);}
+    .fill-gold{background:linear-gradient(90deg,rgba(255,180,0,0.45),#ffb400);box-shadow:0 0 10px rgba(255,180,0,0.3);}
+
+    /* Ongoing projects panel */
+    .ongoing-item{display:flex;flex-direction:column;gap:5px;padding:0.9rem 0;border-bottom:1px solid var(--border);}
+    .ongoing-item:last-child{border-bottom:none;padding-bottom:0;}
+    .ongoing-item:first-child{padding-top:0;}
+    .ongoing-title{font-size:0.85rem;font-weight:700;color:var(--text);}
+    .ongoing-tech{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--cyan);letter-spacing:1px;}
+    .ongoing-status{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--muted);}
+    .ongoing-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s ease infinite;flex-shrink:0;}
+    .ongoing-desc{font-size:0.8rem;color:var(--muted);line-height:1.6;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
 
     /* SECTIONS */
-    section { position: relative; z-index: 1; padding: 6rem 4rem; max-width: 1100px; margin: 0 auto; }
-    .section-label { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--green); letter-spacing: 4px; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 10px; }
-    .section-label::after { content: ''; flex: 1; max-width: 60px; height: 1px; background: var(--green); }
-    .section-title { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 3rem; }
+    section{position:relative;z-index:1;padding:6rem 5rem;border-top:1px solid var(--border);}
+    .section-label{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--green);letter-spacing:5px;margin-bottom:0.5rem;display:flex;align-items:center;gap:10px;}
+    .section-label::after{content:'';flex:1;max-width:50px;height:1px;background:var(--green);}
+    .section-title{font-size:clamp(2rem,3.5vw,2.8rem);font-weight:800;letter-spacing:-1px;margin-bottom:3rem;}
 
     /* ABOUT */
-    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
-    .about-text { line-height: 1.9; color: var(--muted); }
-    .about-text p { margin-bottom: 1.2rem; }
-    .about-text strong { color: var(--text); }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; transition: border-color 0.2s, box-shadow 0.2s; }
-    .stat-card:hover { border-color: var(--green); box-shadow: var(--glow); }
-    .stat-num { font-family: 'Share Tech Mono', monospace; font-size: 2rem; color: var(--green); display: block; margin-bottom: 0.3rem; }
-    .stat-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 1px; }
+    .about-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:5rem;align-items:start;}
+    .about-text{line-height:1.9;color:var(--muted);}
+    .about-text p{margin-bottom:1.2rem;}
+    .about-text strong{color:var(--text);}
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.5rem;transition:border-color 0.2s,transform 0.2s;}
+    .stat-card:hover{border-color:var(--green);transform:translateY(-2px);box-shadow:var(--glow);}
+    .stat-num{font-family:'Share Tech Mono',monospace;font-size:2rem;color:var(--green);display:block;margin-bottom:0.3rem;}
+    .stat-label{font-size:0.68rem;color:var(--muted);letter-spacing:2px;font-family:'Share Tech Mono',monospace;}
 
-    /* SKILLS */
-    .skills-wrapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
-    .skill-group { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 1.5rem; transition: border-color 0.2s; }
-    .skill-group:hover { border-color: var(--cyan); }
-    .skill-group-title { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--cyan); letter-spacing: 2px; margin-bottom: 1rem; }
-    .skill-tag { display: inline-block; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.15); color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; padding: 0.3rem 0.7rem; border-radius: 2px; margin: 0.2rem; letter-spacing: 1px; }
+    /* SKILLS full section */
+    .skills-cols{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
+    .skills-wrapper{display:flex;flex-direction:column;gap:1.1rem;}
+    .skill-group{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.2rem 1.4rem;transition:border-color 0.2s;}
+    .skill-group:hover{border-color:var(--cyan);}
+    .skill-group-title{font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--cyan);letter-spacing:3px;margin-bottom:0.8rem;}
+    .skill-tag{display:inline-block;background:rgba(0,255,136,0.04);border:1px solid rgba(0,255,136,0.12);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.66rem;padding:0.22rem 0.55rem;border-radius:2px;margin:0.13rem;letter-spacing:1px;transition:all 0.15s;}
+    .skill-tag:hover{background:rgba(0,255,136,0.1);border-color:rgba(0,255,136,0.4);}
 
     /* PROJECTS */
-    .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .project-card { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 2rem; transition: all 0.3s; position: relative; overflow: hidden; }
-    .project-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--green), var(--cyan)); transform: scaleX(0); transform-origin: left; transition: transform 0.3s; }
-    .project-card:hover { border-color: rgba(0,255,136,0.3); box-shadow: var(--glow); transform: translateY(-3px); }
-    .project-card:hover::before { transform: scaleX(1); }
-    .project-num { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 0.8rem; }
-    .project-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.8rem; color: white; }
-    .project-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.2rem; }
-    .project-feature { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--muted); display: flex; align-items: center; gap: 8px; padding: 0.25rem 0; }
-    .project-feature::before { content: '→'; color: var(--green); }
-    .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1.2rem; }
-    .project-tag { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.6rem; border-radius: 2px; letter-spacing: 1px; }
-    .tag-py { background: rgba(0,212,255,0.08); color: var(--cyan); border: 1px solid rgba(0,212,255,0.2); }
-    .tag-sec { background: rgba(255,60,90,0.08); color: var(--red); border: 1px solid rgba(255,60,90,0.2); }
-    .tag-tk { background: rgba(0,255,136,0.08); color: var(--green); border: 1px solid rgba(0,255,136,0.2); }
+    .project-category-header{font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:4px;margin:2.5rem 0 1.2rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+    .project-category-header::before{content:'▸';color:var(--green);}
+    .projects-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+    .project-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1.8rem;transition:all 0.3s;position:relative;overflow:hidden;}
+    .project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),var(--cyan));transform:scaleX(0);transform-origin:left;transition:transform 0.35s;}
+    .project-card:hover{border-color:rgba(0,255,136,0.25);box-shadow:var(--glow);transform:translateY(-3px);}
+    .project-card:hover::before{transform:scaleX(1);}
+    .project-num{font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--muted);letter-spacing:2px;margin-bottom:0.6rem;}
+    .project-title{font-size:1rem;font-weight:700;margin-bottom:0.6rem;color:white;}
+    .project-desc{font-size:0.84rem;color:var(--muted);line-height:1.75;margin-bottom:1rem;}
+    .project-feature{font-family:'Share Tech Mono',monospace;font-size:0.66rem;color:var(--muted);display:flex;align-items:center;gap:8px;padding:0.18rem 0;}
+    .project-feature::before{content:'→';color:var(--green);flex-shrink:0;}
+    .project-tags{display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:1rem;}
+    .project-tag{font-family:'Share Tech Mono',monospace;font-size:0.58rem;padding:0.18rem 0.5rem;border-radius:2px;letter-spacing:1px;}
+    .tag-py{background:rgba(0,212,255,0.08);color:var(--cyan);border:1px solid rgba(0,212,255,0.2);}
+    .tag-sec{background:rgba(255,60,90,0.08);color:var(--red);border:1px solid rgba(255,60,90,0.2);}
+    .tag-tk{background:rgba(0,255,136,0.08);color:var(--green);border:1px solid rgba(0,255,136,0.2);}
+    .tag-c{background:rgba(255,180,0,0.08);color:#ffb400;border:1px solid rgba(255,180,0,0.2);}
+
+    /* dual source code button */
+    .code-btns{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1rem;}
+    .view-code-btn{display:inline-flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:0.62rem;letter-spacing:1.5px;color:var(--green);border:1px solid rgba(0,255,136,0.2);background:rgba(0,255,136,0.03);padding:0.42rem 0.85rem;border-radius:2px;transition:all 0.2s;}
+    .view-code-btn:hover{background:rgba(0,255,136,0.1);border-color:var(--green);box-shadow:var(--glow);}
+    .view-code-btn .btn-icon{color:var(--cyan);}
+    .view-code-btn.alt{color:var(--cyan);border-color:rgba(0,212,255,0.2);background:rgba(0,212,255,0.03);}
+    .view-code-btn.alt:hover{background:rgba(0,212,255,0.1);border-color:var(--cyan);box-shadow:0 0 20px rgba(0,212,255,0.15);}
 
     /* ROADMAP */
-    .roadmap { display: flex; flex-direction: column; position: relative; }
-    .roadmap::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 1px; background: var(--border); }
-    .roadmap-item { display: flex; gap: 2rem; padding: 1.5rem 0; position: relative; }
-    .roadmap-dot { width: 41px; flex-shrink: 0; display: flex; justify-content: center; padding-top: 4px; }
-    .roadmap-dot span { width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--green); position: relative; z-index: 1; display: block; }
-    .roadmap-dot.active span { background: var(--green); box-shadow: 0 0 10px var(--green); }
-    .roadmap-dot.upcoming span { border-color: var(--muted); }
-    .roadmap-phase { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--green); letter-spacing: 2px; margin-bottom: 0.3rem; }
-    .roadmap-phase.upcoming { color: var(--muted); }
-    .roadmap-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
-    .roadmap-desc { font-size: 0.85rem; color: var(--muted); }
+    .roadmap{display:flex;flex-direction:column;position:relative;}
+    .roadmap::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:1px;background:var(--border);}
+    .roadmap-item{display:flex;gap:2rem;padding:1.5rem 0;}
+    .roadmap-dot{width:41px;flex-shrink:0;display:flex;justify-content:center;padding-top:4px;}
+    .roadmap-dot span{width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--green);position:relative;z-index:1;display:block;}
+    .roadmap-dot.active span{background:var(--green);box-shadow:0 0 10px var(--green);}
+    .roadmap-dot.upcoming span{border-color:var(--muted);}
+    .roadmap-phase{font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--green);letter-spacing:2px;margin-bottom:0.3rem;}
+    .roadmap-phase.upcoming{color:var(--muted);}
+    .roadmap-title{font-size:1rem;font-weight:700;margin-bottom:0.3rem;}
+    .roadmap-desc{font-size:0.84rem;color:var(--muted);line-height:1.6;}
 
     /* CONTACT */
-    .contact-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
-    .contact-intro { line-height: 1.9; color: var(--muted); }
-    .contact-intro p { margin-bottom: 1rem; }
-    .contact-links { display: flex; flex-direction: column; gap: 1rem; }
-    .contact-link { display: flex; align-items: center; gap: 1rem; background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 1.2rem 1.5rem; text-decoration: none; color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; transition: all 0.2s; }
-    .contact-link:hover { border-color: var(--green); color: var(--green); box-shadow: var(--glow); }
-    .contact-link .icon { font-size: 1.1rem; width: 20px; text-align: center; }
-    .contact-label { color: var(--muted); font-size: 0.65rem; letter-spacing: 1px; display: block; margin-bottom: 2px; }
+    .contact-wrapper{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;}
+    .contact-intro{line-height:1.9;color:var(--muted);}
+    .contact-intro p{margin-bottom:1rem;}
+    .contact-links{display:flex;flex-direction:column;gap:0.8rem;}
+    .contact-link{display:flex;align-items:center;gap:1rem;background:var(--card);border:1px solid var(--border);border-radius:3px;padding:1rem 1.3rem;text-decoration:none;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.76rem;transition:all 0.2s;}
+    .contact-link:hover{border-color:var(--green);color:var(--green);box-shadow:var(--glow);transform:translateX(4px);}
+    .contact-link .icon{font-size:1rem;width:20px;text-align:center;}
+    .contact-label{color:var(--muted);font-size:0.58rem;letter-spacing:2px;display:block;margin-bottom:2px;}
 
     /* FOOTER */
-    footer { border-top: 1px solid var(--border); padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--muted); }
-    footer span { color: var(--green); }
+    footer{border-top:1px solid var(--border);padding:1.6rem 5rem;display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--muted);}
+    footer span{color:var(--green);}
 
-    /* Scanline */
-    @keyframes scanline { 0% { top: -10%; } 100% { top: 110%; } }
-    .scanline { position: fixed; left: 0; right: 0; height: 2px; background: linear-gradient(transparent, rgba(0,255,136,0.04), transparent); pointer-events: none; z-index: 0; animation: scanline 8s linear infinite; }
+    @keyframes scanline{0%{top:-10%;}100%{top:110%;}}
+    .scanline{position:fixed;left:0;right:0;height:2px;background:linear-gradient(transparent,rgba(0,255,136,0.03),transparent);pointer-events:none;z-index:0;animation:scanline 8s linear infinite;}
 
-    @media (max-width: 900px) {
-      nav { padding: 1rem 2rem; } .nav-links { display: none; }
-      .hero { padding: 7rem 2rem 4rem; } .terminal { display: none; }
-      section { padding: 4rem 2rem; }
-      .about-grid, .projects-grid, .skills-wrapper, .contact-wrapper { grid-template-columns: 1fr; }
-      footer { padding: 1.5rem 2rem; flex-direction: column; gap: 0.5rem; text-align: center; }
-    }
+    /* CODE MODAL */
+    .code-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);z-index:9999;align-items:center;justify-content:center;}
+    .code-modal-overlay.open{display:flex;}
+    .code-modal{background:var(--bg2);border:1px solid var(--border);border-radius:4px;width:90%;max-width:820px;max-height:82vh;display:flex;flex-direction:column;box-shadow:0 40px 100px rgba(0,0,0,0.8),0 0 60px rgba(0,255,136,0.05);}
+    .code-modal-header{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1.2rem;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:4px 4px 0 0;}
+    .modal-dots{display:flex;gap:6px;}
+    .code-modal-title{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--green);letter-spacing:2px;}
+    .code-modal-close{background:none;border:none;color:var(--muted);font-size:1rem;transition:color 0.2s;padding:0 4px;}
+    .code-modal-close:hover{color:var(--red);}
+    /* Tab switcher for dual files */
+    .code-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--bg3);}
+    .code-tab{font-family:'Share Tech Mono',monospace;font-size:0.65rem;padding:0.55rem 1.2rem;background:none;border:none;color:var(--muted);letter-spacing:1px;transition:all 0.15s;border-bottom:2px solid transparent;margin-bottom:-1px;}
+    .code-tab:hover{color:var(--text);}
+    .code-tab.active{color:var(--green);border-bottom-color:var(--green);}
+    .code-modal-body{overflow-y:auto;padding:1.2rem;}
+    .code-modal-body::-webkit-scrollbar{width:3px;}
+    .code-modal-body::-webkit-scrollbar-thumb{background:var(--green);}
+    .code-readonly-notice{font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--muted);letter-spacing:1px;margin-bottom:0.8rem;}
+    pre{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1.2rem;overflow-x:auto;font-family:'Share Tech Mono',monospace;font-size:0.72rem;line-height:1.85;color:var(--text);user-select:none;-webkit-user-select:none;pointer-events:none;}
+    .kw{color:#ff79c6;}.fn{color:#50fa7b;}.str{color:#f1fa8c;}.cm{color:#6272a4;font-style:italic;}.num{color:#bd93f9;}.cls{color:var(--cyan);}.vr{color:#ffb86c;}.op{color:var(--green);}
+
+    @media(max-width:1100px){.hero{grid-template-columns:1fr;}.hero-right{display:none;}}
+    @media(max-width:860px){.sidenav{display:none;}.main{margin-left:0;}section{padding:4rem 2rem;}.hero{padding:6rem 2rem 4rem;}.about-layout,.skills-cols,.projects-grid,.contact-wrapper{grid-template-columns:1fr;}footer{padding:1.5rem 2rem;flex-direction:column;gap:0.5rem;text-align:center;}}
   </style>
 </head>
 <body>
-
-  <div id="gCursor"></div>
-  <div id="gRing"></div>
+  <div id="cur"><div class="ch-h"></div><div class="ch-v"></div><div class="gl gl-l"></div><div class="gl gl-r"></div><div class="gl gl-t"></div><div class="gl gl-b"></div><div class="ch-c"></div></div>
+  <div id="cur-ring"></div>
   <div class="scanline"></div>
 
-  <nav>
-    <div class="nav-logo">A<span>.</span>SITOULA</div>
-    <ul class="nav-links">
-      <li><a href="#about">about</a></li>
-      <li><a href="#skills">skills</a></li>
-      <li><a href="#projects">projects</a></li>
-      <li><a href="#roadmap">roadmap</a></li>
-      <li><a href="#contact">contact</a></li>
+  <!-- SIDENAV -->
+  <nav class="sidenav">
+    <div class="sidenav-logo">A<span>.</span>SITOULA<small>PORTFOLIO_2025</small></div>
+    <ul class="sidenav-links">
+      <li><a href="#about"><span class="nn">01 //</span> ABOUT</a></li>
+      <li><a href="#skills"><span class="nn">02 //</span> SKILLS</a></li>
+      <li><a href="#projects"><span class="nn">03 //</span> PROJECTS</a></li>
+      <li><a href="#roadmap"><span class="nn">04 //</span> ROADMAP</a></li>
+      <li><a href="#contact"><span class="nn">05 //</span> CONTACT</a></li>
     </ul>
+    <div class="sidenav-footer">
+      <div class="sdot"><div class="sdot-dot"></div>OPEN TO COLLABORATE</div>
+      <div>NEPAL &#127475;&#127477;</div>
+    </div>
   </nav>
 
-  <div style="position:relative;z-index:1;">
+  <div class="main">
+
+    <!-- HERO -->
     <div class="hero">
-      <div class="hero-badge">PORTFOLIO 2025 <span class="blink">_</span></div>
-      <h1>
-        <span class="name-line">Animesh</span>
-        <span class="name-line highlight">Sitoula</span>
-      </h1>
-      <p class="hero-role">// CYBERSECURITY STUDENT &amp; PYTHON DEVELOPER</p>
-      <p class="hero-desc">Class 11 student from Nepal building the foundations of ethical hacking and cybersecurity. I learn by building — turning concepts into real programs, one project at a time.</p>
-      <div class="hero-ctas">
-        <a href="#projects" class="btn btn-primary">VIEW PROJECTS</a>
-        <a href="#contact" class="btn btn-outline">GET IN TOUCH</a>
+      <!-- LEFT: name + role + ctas + tech stack -->
+      <div class="hero-left">
+        <div class="hero-badge">PORTFOLIO 2025 <span class="blink">_</span></div>
+        <h1>
+          <span class="name-line">Animesh</span>
+          <span class="name-line highlight">Sitoula</span>
+        </h1>
+        <p class="hero-role">// CYBERSECURITY STUDENT &amp; PYTHON DEVELOPER</p>
+        <p class="hero-desc">Class 11 student from Nepal building the foundations of ethical hacking and cybersecurity. I learn by building — turning concepts into real programs, one project at a time.</p>
+        <div class="hero-ctas">
+          <a href="#projects" class="btn btn-primary">VIEW PROJECTS</a>
+          <a href="#contact" class="btn btn-outline">GET IN TOUCH</a>
+        </div>
+        <div class="hero-stack">
+          <div class="hero-stack-label">// TECH STACK</div>
+          <div class="hero-stack-tags">
+            <span class="stack-tag">Python</span><span class="stack-tag">Bash</span><span class="stack-tag">C</span><span class="stack-tag">Java</span>
+            <span class="stack-tag">Tkinter</span><span class="stack-tag">JSON</span><span class="stack-tag">OOP</span>
+            <span class="stack-tag">Kali Linux</span><span class="stack-tag">Linux CLI</span>
+            <span class="stack-tag">Git</span><span class="stack-tag">VS Code</span>
+            <span class="stack-tag">TCP/IP</span><span class="stack-tag">Nmap</span><span class="stack-tag">Sockets</span>
+          </div>
+        </div>
       </div>
-      <div class="terminal">
-        <div class="terminal-bar">
-          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-          <span class="terminal-title">animesh@kali:~</span>
+
+      <!-- RIGHT: proficiency bars + ongoing projects -->
+      <div class="hero-right">
+
+        <!-- Proficiency panel -->
+        <div class="panel" id="skillBars">
+          <div class="panel-title">PROFICIENCY LEVELS</div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-bar-name">Python</span>
+              <div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">60%</span></div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-green" data-w="60"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-bar-name">Linux / Kali Linux</span>
+              <div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">55%</span></div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-red" data-w="55"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-bar-name">Networking</span>
+              <div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">50%</span></div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-cyan" data-w="50"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-bar-name">OOP &amp; Design</span>
+              <div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">58%</span></div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-green" data-w="58"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-bar-name">Cybersecurity</span>
+              <div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">48%</span></div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-red" data-w="48"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-bar-name">Git &amp; Tooling</span>
+              <div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">52%</span></div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-gold" data-w="52"></div></div>
+          </div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header">
+              <span class="skill-bar-name">Data Handling</span>
+              <div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">62%</span></div>
+            </div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-cyan" data-w="62"></div></div>
+          </div>
+
+        </div><!-- end panel -->
+
+        <!-- Ongoing projects panel -->
+        <div class="panel">
+          <div class="panel-title">ONGOING PROJECTS</div>
+
+          <div class="ongoing-item">
+            <div class="ongoing-title">Simple Firewall Implementation</div>
+            <div class="ongoing-tech">PYTHON · NETWORKING · SECURITY</div>
+            <div class="ongoing-status"><div class="ongoing-dot"></div>IN DEVELOPMENT</div>
+            <div class="ongoing-desc">A packet-filtering firewall built in Python that intercepts, inspects, and allows or blocks network traffic based on configurable rules — exploring how real firewalls operate at the packet level.</div>
+          </div>
+
+        </div><!-- end ongoing panel -->
+
+      </div><!-- end hero-right -->
+    </div><!-- end hero -->
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="section-label">01 // ABOUT</div>
+      <h2 class="section-title">Who I Am</h2>
+      <div class="about-layout">
+        <div class="about-text">
+          <p>I'm <strong>Animesh Sitoula</strong>, a Class 11 student from Nepal with a deep passion for technology, cybersecurity, and programming. I'm fascinated by how computer systems operate under the hood — from network packets to kernel-level processes.</p>
+          <p>My goal is to become a skilled <strong>ethical hacker and cybersecurity professional</strong>. I'm currently building that foundation by mastering Python, networking fundamentals, Linux systems, and introductory security tools like those found in Kali Linux.</p>
+          <p>I believe in <strong>learning by doing</strong>. Rather than passively studying theory, I apply every concept I learn to a real project — whether that's a data analysis tool, a network scanner, or a security lab environment.</p>
+          <p>This portfolio is my public learning log — a showcase of the projects, experiments, and skills I've built on the way to becoming a cybersecurity professional.</p>
         </div>
-        <div class="terminal-body">
-          <div><span class="t-prompt">$ </span><span class="t-cmd">whoami</span></div>
-          <div class="t-output t-highlight">animesh_sitoula</div>
-          <div><span class="t-prompt">$ </span><span class="t-cmd">cat info.txt</span></div>
-          <div class="t-output">Location: <span class="t-highlight">Nepal 🇳🇵</span></div>
-          <div class="t-output">Grade: <span class="t-highlight">Class 11</span></div>
-          <div class="t-output">Focus: <span class="t-highlight">Cybersecurity</span></div>
-          <div><span class="t-prompt">$ </span><span class="t-cmd">ls skills/</span></div>
-          <div class="t-output">python/  linux/  networking/  cryptography/</div>
-          <div><span class="t-prompt">$ </span><span class="t-cmd">./run_ambition.sh</span></div>
-          <div class="t-output t-warn">→ becoming ethical hacker...</div>
-          <div><span class="t-prompt">$ </span><span class="t-cmd blink">_</span></div>
+        <div class="stats-grid">
+          <div class="stat-card"><span class="stat-num">7+</span><span class="stat-label">PROJECTS BUILT</span></div>
+          <div class="stat-card"><span class="stat-num">3+</span><span class="stat-label">YEARS CODING</span></div>
+          <div class="stat-card"><span class="stat-num">NP &#127475;&#127477;</span><span class="stat-label">BASED IN NEPAL</span></div>
+          <div class="stat-card"><span class="stat-num">&#8734;</span><span class="stat-label">CURIOSITY LEVEL</span></div>
         </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="section-label">02 // SKILLS</div>
+      <h2 class="section-title">Tech Stack</h2>
+      <div class="skills-cols">
+        <div class="skills-wrapper">
+          <div class="skill-group">
+            <div class="skill-group-title">PROGRAMMING LANGUAGES</div>
+            <span class="skill-tag">Python</span><span class="skill-tag">Basic Java</span><span class="skill-tag">C (Encryption)</span><span class="skill-tag">Bash</span>
+          </div>
+          <div class="skill-group">
+            <div class="skill-group-title">TECHNOLOGIES &amp; FRAMEWORKS</div>
+            <span class="skill-tag">Tkinter</span><span class="skill-tag">JSON Handling</span><span class="skill-tag">Event-Driven Programming</span><span class="skill-tag">OOP</span>
+          </div>
+          <div class="skill-group">
+            <div class="skill-group-title">CYBERSECURITY &amp; SYSTEMS</div>
+            <span class="skill-tag">Linux Environment</span><span class="skill-tag">Kali Linux</span><span class="skill-tag">Encryption &amp; Hashing</span><span class="skill-tag">Bootable OS</span>
+          </div>
+          <div class="skill-group">
+            <div class="skill-group-title">NETWORKING</div>
+            <span class="skill-tag">IP Addressing</span><span class="skill-tag">Client–Server</span><span class="skill-tag">TCP/IP Protocols</span><span class="skill-tag">Troubleshooting</span>
+          </div>
+          <div class="skill-group">
+            <div class="skill-group-title">DEVELOPMENT TOOLS</div>
+            <span class="skill-tag">Git &amp; GitHub</span><span class="skill-tag">Linux Terminal</span><span class="skill-tag">VS Code / IDEs</span>
+          </div>
+          <div class="skill-group">
+            <div class="skill-group-title">MATHEMATICS &amp; ANALYTICS</div>
+            <span class="skill-tag">Calculus</span><span class="skill-tag">Matrix Operations</span><span class="skill-tag">Algorithmic Thinking</span><span class="skill-tag">Mathematical Modeling</span>
+          </div>
+          <div class="skill-group">
+            <div class="skill-group-title">CURRENTLY LEARNING</div>
+            <span class="skill-tag">Ethical Hacking</span><span class="skill-tag">Cybersecurity Tools</span><span class="skill-tag">Python Automation for Security</span><span class="skill-tag">Advanced Networking</span><span class="skill-tag">Nmap</span><span class="skill-tag">Metasploit</span><span class="skill-tag">Wireshark</span>
+          </div>
+        </div>
+
+        <!-- right: full bars in skills section too -->
+        <div id="skillBars2">
+          <div class="panel-title" style="font-family:'Share Tech Mono',monospace;font-size:0.62rem;color:var(--green);letter-spacing:4px;margin-bottom:1.4rem;display:flex;align-items:center;gap:8px;">PROFICIENCY LEVELS<span style="flex:1;height:1px;background:rgba(0,255,136,0.18);display:block;"></span></div>
+
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">Python</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">60%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-green" data-w="60"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">Data Handling (JSON)</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">62%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-cyan" data-w="62"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">GUI Dev (Tkinter)</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">55%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-green" data-w="55"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">OOP &amp; Design Patterns</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">58%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-cyan" data-w="58"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">Linux / Kali Linux</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">55%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-red" data-w="55"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">Git &amp; Version Control</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">52%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-gold" data-w="52"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">Networking Fundamentals</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">50%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-red" data-w="50"></div></div>
+          </div>
+          <div class="skill-bar-item">
+            <div class="skill-bar-header"><span class="skill-bar-name">Cybersecurity Concepts</span><div class="skill-bar-meta"><span class="skill-bar-level">INTERMEDIATE</span><span class="skill-bar-pct">48%</span></div></div>
+            <div class="skill-bar-track"><div class="skill-bar-fill fill-gold" data-w="48"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="section-label">03 // PROJECTS</div>
+      <h2 class="section-title">What I've Built</h2>
+
+      <div class="project-category-header">SOFTWARE DEVELOPMENT</div>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-num">PROJECT_01 // DATA ANALYSIS</div>
+          <div class="project-title">Student Performance Analysis System</div>
+          <div class="project-desc">A full Python CLI application that manages student records across multiple subjects, persisting data with JSON and computing rankings, averages, pass/fail results, and subject-wise toppers.</div>
+          <div class="project-feature">Multi-subject record input with validation</div>
+          <div class="project-feature">JSON file persistence with append logic</div>
+          <div class="project-feature">Pass/fail check using <code style="color:var(--cyan);font-size:0.65rem;">all()</code> + comprehensions</div>
+          <div class="project-feature">Lambda-sorted class ranking system</div>
+          <div class="project-feature">Subject-wise topper detection</div>
+          <div class="project-feature">Interactive menu-driven CLI loop</div>
+          <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-py">JSON</span><span class="project-tag tag-tk">FILE I/O</span><span class="project-tag tag-tk">CLI</span></div>
+          <div class="code-btns">
+            <button class="view-code-btn" onclick="openCode('student')"><span class="btn-icon">&lt;/&gt;</span> VIEW SOURCE CODE</button>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-num">PROJECT_02 // GUI APPLICATIONS</div>
+          <div class="project-title">Python GUI Applications</div>
+          <div class="project-desc">A suite of desktop applications built with Tkinter, demonstrating event-driven architecture, form validation, real-time widget updates, and structured layout management using frames and grids.</div>
+          <div class="project-feature">Multi-frame layout with grid/pack managers</div>
+          <div class="project-feature">Live input validation and error feedback</div>
+          <div class="project-feature">Event binding and callback architecture</div>
+          <div class="project-feature">Styled widgets with custom color themes</div>
+          <div class="project-feature">Dynamic label and entry field updates</div>
+          <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-tk">TKINTER</span><span class="project-tag tag-tk">GUI</span><span class="project-tag tag-tk">OOP</span></div>
+          <div class="code-btns">
+            <button class="view-code-btn" onclick="openCode('tkinter')"><span class="btn-icon">&lt;/&gt;</span> VIEW SOURCE CODE</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-category-header">NETWORKING PROJECTS</div>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-num">PROJECT_03 // NETWORK TOOL</div>
+          <div class="project-title">Network Mapper</div>
+          <div class="project-desc">A multithreaded Python tool that performs host discovery across a subnet using ICMP ping sweeps, resolves hostnames via reverse DNS, and reports active devices with their system information.</div>
+          <div class="project-feature">CIDR subnet parsing with <code style="color:var(--cyan);font-size:0.65rem;">ipaddress</code> module</div>
+          <div class="project-feature">Concurrent ping sweep via ThreadPoolExecutor</div>
+          <div class="project-feature">Reverse DNS hostname resolution</div>
+          <div class="project-feature">Structured output with IP and host mapping</div>
+          <div class="project-feature">Configurable thread count for scan speed</div>
+          <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-sec">NETWORKING</span><span class="project-tag tag-sec">SOCKETS</span><span class="project-tag tag-sec">THREADING</span></div>
+          <div class="code-btns">
+            <button class="view-code-btn" onclick="openCode('netmapper')"><span class="btn-icon">&lt;/&gt;</span> VIEW SOURCE CODE</button>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-num">PROJECT_04 // SECURITY TOOL</div>
+          <div class="project-title">Port Scanner</div>
+          <div class="project-desc">A TCP port scanner with concurrent scanning, service banner grabbing, and common port identification. Designed to understand how security tools probe systems and how services expose themselves on a network.</div>
+          <div class="project-feature">Multi-threaded TCP connect scanning</div>
+          <div class="project-feature">Service banner grabbing on open ports</div>
+          <div class="project-feature">Common port-to-service name mapping</div>
+          <div class="project-feature">Scan timing and result summary report</div>
+          <div class="project-feature">Target resolution with error handling</div>
+          <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-sec">PORT SCANNING</span><span class="project-tag tag-sec">TCP</span><span class="project-tag tag-sec">THREADING</span></div>
+          <div class="code-btns">
+            <button class="view-code-btn" onclick="openCode('portscanner')"><span class="btn-icon">&lt;/&gt;</span> VIEW SOURCE CODE</button>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-num">PROJECT_05 // NETWORKING</div>
+          <div class="project-title">Client–Server Architecture</div>
+          <div class="project-desc">A Python TCP client–server system demonstrating socket programming, connection handling, and bidirectional message passing. The server handles multiple clients and the client connects and communicates in real time.</div>
+          <div class="project-feature">TCP socket server with connection loop</div>
+          <div class="project-feature">Threaded client handler per connection</div>
+          <div class="project-feature">Bidirectional message exchange protocol</div>
+          <div class="project-feature">Graceful disconnection and error handling</div>
+          <div class="project-feature">Client with send/receive loop</div>
+          <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-sec">SOCKETS</span><span class="project-tag tag-sec">TCP</span><span class="project-tag tag-tk">THREADING</span></div>
+          <div class="code-btns">
+            <button class="view-code-btn" onclick="openCode('server')"><span class="btn-icon">&lt;/&gt;</span> server.py</button>
+            <button class="view-code-btn alt" onclick="openCode('client')"><span class="btn-icon">&lt;/&gt;</span> client.py</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-category-header">ETHICAL HACKING / SECURITY PROJECTS</div>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-num">PROJECT_06 // CRYPTOGRAPHY</div>
+          <div class="project-title">Cipher Encryption Algorithm</div>
+          <div class="project-desc">A custom encryption program in C implementing a Caesar cipher with configurable shift, encryption, decryption, and a character-by-character transformation loop. Demonstrates low-level string manipulation and symmetric key concepts.</div>
+          <div class="project-feature">Configurable Caesar shift constant</div>
+          <div class="project-feature">Uppercase and lowercase character handling</div>
+          <div class="project-feature">Symmetric encrypt and decrypt functions</div>
+          <div class="project-feature">Input via fgets with newline stripping</div>
+          <div class="project-feature">Low-level C pointer and array manipulation</div>
+          <div class="project-tags"><span class="project-tag tag-c">C LANGUAGE</span><span class="project-tag tag-sec">ENCRYPTION</span><span class="project-tag tag-sec">CRYPTOGRAPHY</span></div>
+          <div class="code-btns">
+            <button class="view-code-btn" onclick="openCode('cipher')"><span class="btn-icon">&lt;/&gt;</span> VIEW SOURCE CODE</button>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-num">PROJECT_07 // SECURITY ENV</div>
+          <div class="project-title">Kali Linux Security Environment</div>
+          <div class="project-desc">A dedicated cybersecurity lab configured for practising security tools, Linux commands, and penetration testing workflows — set up via a Bash automation script that installs tools and scaffolds a workspace.</div>
+          <div class="project-feature">Automated tool installation via apt</div>
+          <div class="project-feature">Workspace directory scaffolding</div>
+          <div class="project-feature">Network interface inspection and routing</div>
+          <div class="project-feature">Automated localhost Nmap scan on setup</div>
+          <div class="project-feature">System info display on completion</div>
+          <div class="project-tags"><span class="project-tag tag-sec">KALI LINUX</span><span class="project-tag tag-sec">BASH</span><span class="project-tag tag-tk">PENTESTING</span></div>
+          <div class="code-btns">
+            <button class="view-code-btn" onclick="openCode('kali')"><span class="btn-icon">&lt;/&gt;</span> VIEW SOURCE CODE</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section id="roadmap">
+      <div class="section-label">04 // ROADMAP</div>
+      <h2 class="section-title">Learning Journey</h2>
+      <div class="roadmap">
+        <div class="roadmap-item">
+          <div class="roadmap-dot active"><span></span></div>
+          <div>
+            <div class="roadmap-phase">PHASE 01 — COMPLETED</div>
+            <div class="roadmap-title">Python Fundamentals &amp; Project Building</div>
+            <div class="roadmap-desc">Mastered core Python: OOP, file I/O, JSON handling, sockets, and GUI with Tkinter. Built 7+ projects from scratch.</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot active"><span></span></div>
+          <div>
+            <div class="roadmap-phase">PHASE 02 — IN PROGRESS</div>
+            <div class="roadmap-title">Linux Systems &amp; Networking</div>
+            <div class="roadmap-desc">Daily use of Linux CLI, Kali Linux environment, studying TCP/IP, DNS, HTTP, OSI model, and building network tools.</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot upcoming"><span></span></div>
+          <div>
+            <div class="roadmap-phase upcoming">PHASE 03 — NEXT</div>
+            <div class="roadmap-title">Ethical Hacking &amp; CTF Competitions</div>
+            <div class="roadmap-desc">Deep dive into penetration testing with Nmap, Metasploit, and Wireshark. Start competing on TryHackMe and HackTheBox.</div>
+          </div>
+        </div>
+        <div class="roadmap-item">
+          <div class="roadmap-dot upcoming"><span></span></div>
+          <div>
+            <div class="roadmap-phase upcoming">PHASE 04 — FUTURE</div>
+            <div class="roadmap-title">CEH / Security Certifications</div>
+            <div class="roadmap-desc">Work towards CompTIA Security+, eJPT, or Certified Ethical Hacker (CEH) to formalize expertise.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="section-label">05 // CONTACT</div>
+      <h2 class="section-title">Get In Touch</h2>
+      <div class="contact-wrapper">
+        <div class="contact-intro">
+          <p>I'm always open to connecting with fellow developers, cybersecurity enthusiasts, and anyone interested in technology and ethical hacking.</p>
+          <p>Whether you want to collaborate on a project, share resources, discuss cybersecurity topics, or just say hello — feel free to reach out!</p>
+          <p style="margin-top:1.5rem;font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--green);">Currently: <span style="color:var(--text);">Open to learning collaborations &amp; mentorship</span></p>
+        </div>
+        <div class="contact-links">
+          <a href="mailto:animeshsitoula@gmail.com" class="contact-link"><span class="icon">&#9993;</span><div><span class="contact-label">EMAIL</span>animeshsitoula@gmail.com</div></a>
+          <a href="https://github.com/animeshsitoula" target="_blank" class="contact-link"><span class="icon">&#8997;</span><div><span class="contact-label">GITHUB</span>github.com/animeshsitoula</div></a>
+          <a href="https://linkedin.com/in/animeshsitoula" target="_blank" class="contact-link"><span class="icon">&#9672;</span><div><span class="contact-label">LINKEDIN</span>linkedin.com/in/animeshsitoula</div></a>
+          <a href="#" class="contact-link"><span class="icon">&#9673;</span><div><span class="contact-label">LOCATION</span>Nepal &#127475;&#127477;</div></a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>&#169; 2025 <span>Animesh Sitoula</span> — All rights reserved</div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--muted);">Made by <span>Animesh</span></div>
+    </footer>
+  </div><!-- end .main -->
+
+  <!-- CODE MODAL -->
+  <div class="code-modal-overlay" id="codeModal">
+    <div class="code-modal">
+      <div class="code-modal-header">
+        <div class="modal-dots"><div class="dot dot-r" style="width:10px;height:10px;border-radius:50%;background:#ff5f57;"></div><div class="dot dot-y" style="width:10px;height:10px;border-radius:50%;background:#febc2e;"></div><div class="dot dot-g" style="width:10px;height:10px;border-radius:50%;background:#28c840;"></div></div>
+        <div class="code-modal-title" id="modalTitle">source_code.py</div>
+        <button class="code-modal-close" onclick="closeCode()">&#x2715;</button>
+      </div>
+      <div id="codeTabsBar" class="code-tabs" style="display:none;"></div>
+      <div class="code-modal-body">
+        <div class="code-readonly-notice">&#9888; READ-ONLY — Copying is disabled.</div>
+        <pre id="modalCode"></pre>
       </div>
     </div>
   </div>
 
-  <section id="about">
-    <div class="section-label">01 // ABOUT</div>
-    <h2 class="section-title">Who I Am</h2>
-    <div class="about-grid">
-      <div class="about-text">
-        <p>I'm <strong>Animesh Sitoula</strong>, a Class 11 student from Nepal with a deep passion for technology, cybersecurity, and programming. I'm fascinated by how computer systems operate under the hood — from network packets to kernel-level processes.</p>
-        <p>My goal is to become a skilled <strong>ethical hacker and cybersecurity professional</strong>. I'm currently building that foundation by mastering Python, networking fundamentals, Linux systems, and introductory security tools like those found in Kali Linux.</p>
-        <p>I believe in <strong>learning by doing</strong>. Rather than passively studying theory, I apply every concept I learn to a real project — whether that's a data analysis tool, a network scanner, or a security lab environment.</p>
-        <p>This portfolio is my public learning log — a showcase of the projects, experiments, and skills I've built on the way to becoming a cybersecurity professional.</p>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-card"><span class="stat-num">4+</span><span class="stat-label">PROJECTS BUILT</span></div>
-        <div class="stat-card"><span class="stat-num">3+</span><span class="stat-label">YEARS CODING</span></div>
-        <div class="stat-card"><span class="stat-num">NP 🇳🇵</span><span class="stat-label">BASED IN NEPAL</span></div>
-        <div class="stat-card"><span class="stat-num">∞</span><span class="stat-label">CURIOSITY LEVEL</span></div>
-      </div>
-    </div>
-  </section>
+  <!-- CODE STORES: safe HTML, no JS string issues -->
+  <div id="code-student" style="display:none"><span class="cm"># Student Performance Analysis System</span>
+<span class="cm"># Technology: Python, JSON &mdash; by Animesh Sitoula</span>
 
-  <section id="skills">
-    <div class="section-label">02 // SKILLS</div>
-    <h2 class="section-title">Tech Stack</h2>
-    <div class="skills-wrapper">
-      <div class="skill-group"><div class="skill-group-title">LANGUAGES</div><span class="skill-tag">Python</span><span class="skill-tag">Bash</span><span class="skill-tag">HTML/CSS</span></div>
-      <div class="skill-group"><div class="skill-group-title">TOOLS & PLATFORMS</div><span class="skill-tag">Kali Linux</span><span class="skill-tag">Linux CLI</span><span class="skill-tag">Git</span><span class="skill-tag">VS Code</span></div>
-      <div class="skill-group"><div class="skill-group-title">PYTHON LIBRARIES</div><span class="skill-tag">Tkinter</span><span class="skill-tag">Sockets</span><span class="skill-tag">JSON</span><span class="skill-tag">OS Module</span></div>
-      <div class="skill-group"><div class="skill-group-title">CYBERSECURITY CONCEPTS</div><span class="skill-tag">Ethical Hacking</span><span class="skill-tag">Cryptography</span><span class="skill-tag">OSINT (learning)</span><span class="skill-tag">CTF Basics</span></div>
-      <div class="skill-group"><div class="skill-group-title">NETWORKING</div><span class="skill-tag">TCP/IP</span><span class="skill-tag">DNS</span><span class="skill-tag">HTTP/HTTPS</span><span class="skill-tag">OSI Model</span></div>
-      <div class="skill-group"><div class="skill-group-title">CURRENTLY LEARNING</div><span class="skill-tag">Nmap</span><span class="skill-tag">Metasploit</span><span class="skill-tag">Wireshark</span><span class="skill-tag">Networking+</span></div>
-    </div>
-  </section>
+<span class="kw">import</span> <span class="cls">json</span> <span class="kw">as</span> j
+<span class="kw">import</span> <span class="cls">os</span>
 
-  <section id="projects">
-    <div class="section-label">03 // PROJECTS</div>
-    <h2 class="section-title">What I've Built</h2>
-    <div class="projects-grid">
-      <div class="project-card">
-        <div class="project-num">PROJECT_01 // DATA ANALYSIS</div>
-        <div class="project-title">Student Performance Analysis System</div>
-        <div class="project-desc">A Python-based system that ingests, stores, and analyzes student academic data — generating rankings and identifying subject-wise toppers through custom algorithms.</div>
-        <div class="project-feature">Student data input system</div>
-        <div class="project-feature">JSON file storage for persistence</div>
-        <div class="project-feature">Subject-wise topper analysis</div>
-        <div class="project-feature">Automated class ranking generation</div>
-        <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-py">JSON</span><span class="project-tag tag-tk">DATA ANALYSIS</span><span class="project-tag tag-tk">FILE I/O</span></div>
-      </div>
-      <div class="project-card">
-        <div class="project-num">PROJECT_02 // NETWORKING</div>
-        <div class="project-title">Network Scanner</div>
-        <div class="project-desc">A Python-based network scanning tool that detects active devices on a network, collects system information, and performs basic port scanning using raw socket programming.</div>
-        <div class="project-feature">Detecting active devices on a network</div>
-        <div class="project-feature">Displaying IP addresses of connected systems</div>
-        <div class="project-feature">Basic port scanning functionality</div>
-        <div class="project-feature">Network communication via Python sockets</div>
-        <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-sec">SOCKETS</span><span class="project-tag tag-sec">NETWORKING</span><span class="project-tag tag-sec">AUTOMATION</span></div>
-      </div>
-      <div class="project-card">
-        <div class="project-num">PROJECT_03 // CYBERSECURITY</div>
-        <div class="project-title">Linux & Cybersecurity Lab Environment</div>
-        <div class="project-desc">A personal hands-on lab built on Kali Linux for practicing real-world security concepts — from command-line mastery to introductory penetration testing tools and network analysis.</div>
-        <div class="project-feature">Linux CLI proficiency & system config</div>
-        <div class="project-feature">Basic networking experiments</div>
-        <div class="project-feature">Introductory security tool usage</div>
-        <div class="project-feature">System hardening practices</div>
-        <div class="project-tags"><span class="project-tag tag-sec">KALI LINUX</span><span class="project-tag tag-sec">SECURITY</span><span class="project-tag tag-sec">NETWORKING</span><span class="project-tag tag-sec">BASH</span></div>
-      </div>
-      <div class="project-card">
-        <div class="project-num">PROJECT_04 // EXPERIMENTS</div>
-        <div class="project-title">Python Programming Experiments</div>
-        <div class="project-desc">A growing collection of Python programs built while mastering core programming concepts — from algorithm challenges and math tools to automation scripts and file handling utilities.</div>
-        <div class="project-feature">Algorithm & problem solving exercises</div>
-        <div class="project-feature">Mathematical computation tools</div>
-        <div class="project-feature">File handling & automation scripts</div>
-        <div class="project-feature">Logic-building mini-projects</div>
-        <div class="project-tags"><span class="project-tag tag-py">PYTHON</span><span class="project-tag tag-tk">ALGORITHMS</span><span class="project-tag tag-tk">AUTOMATION</span><span class="project-tag tag-py">SCRIPTING</span></div>
-      </div>
-    </div>
-  </section>
+subjects <span class="op">=</span> (<span class="str">"math"</span>, <span class="str">"physics"</span>, <span class="str">"chemistry"</span>, <span class="str">"computer"</span>, <span class="str">"english"</span>, <span class="str">"nepali"</span>)
+subject_maximum_marks <span class="op">=</span> {subj: <span class="num">0</span> <span class="kw">for</span> subj <span class="kw">in</span> subjects}
+subject_topper        <span class="op">=</span> {subj: <span class="str">"N/A"</span> <span class="kw">for</span> subj <span class="kw">in</span> subjects}
 
-  <section id="roadmap">
-    <div class="section-label">04 // ROADMAP</div>
-    <h2 class="section-title">Learning Journey</h2>
-    <div class="roadmap">
-      <div class="roadmap-item">
-        <div class="roadmap-dot active"><span></span></div>
-        <div class="roadmap-content">
-          <div class="roadmap-phase">PHASE 01 — COMPLETED</div>
-          <div class="roadmap-title">Python Fundamentals & Project Building</div>
-          <div class="roadmap-desc">Mastered core Python: OOP, file I/O, JSON handling, sockets, and GUI with Tkinter. Built 4+ projects from scratch.</div>
-        </div>
-      </div>
-      <div class="roadmap-item">
-        <div class="roadmap-dot active"><span></span></div>
-        <div class="roadmap-content">
-          <div class="roadmap-phase">PHASE 02 — IN PROGRESS</div>
-          <div class="roadmap-title">Linux Systems & Networking</div>
-          <div class="roadmap-desc">Daily use of Linux CLI, Kali Linux environment, and studying TCP/IP, DNS, HTTP, and the OSI model.</div>
-        </div>
-      </div>
-      <div class="roadmap-item">
-        <div class="roadmap-dot upcoming"><span></span></div>
-        <div class="roadmap-content">
-          <div class="roadmap-phase upcoming">PHASE 03 — NEXT</div>
-          <div class="roadmap-title">Ethical Hacking & CTF Competitions</div>
-          <div class="roadmap-desc">Deep dive into penetration testing with Nmap, Metasploit, and Wireshark. Start competing on TryHackMe and HackTheBox.</div>
-        </div>
-      </div>
-      <div class="roadmap-item">
-        <div class="roadmap-dot upcoming"><span></span></div>
-        <div class="roadmap-content">
-          <div class="roadmap-phase upcoming">PHASE 04 — FUTURE</div>
-          <div class="roadmap-title">CEH / Security Certifications</div>
-          <div class="roadmap-desc">Work towards CompTIA Security+, eJPT, or Certified Ethical Hacker (CEH) to formalize expertise.</div>
-        </div>
-      </div>
-    </div>
-  </section>
+<span class="kw">def</span> <span class="fn">add_student_record</span>(no_of_students):
+    student_record <span class="op">=</span> []
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, no_of_students <span class="op">+</span> <span class="num">1</span>):
+        total_marks <span class="op">=</span> <span class="num">0</span>
+        record <span class="op">=</span> {
+            <span class="str">"name"</span>: <span class="fn">str</span>(<span class="fn">input</span>(<span class="str">f"Enter name of student {i}: "</span>)),
+            <span class="str">"age"</span>:  <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">f"Enter age of student {i}: "</span>))
+        }
+        <span class="kw">for</span> subj <span class="kw">in</span> subjects:
+            marks <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">f"Enter marks in {subj}: "</span>))
+            <span class="kw">if</span> marks <span class="op">&gt;</span> <span class="num">75</span>:
+                <span class="kw">raise</span> <span class="cls">ValueError</span>(<span class="str">"Marks must not exceed 75"</span>)
+            record[<span class="str">f"marks in {subj}"</span>] <span class="op">=</span> marks
+            total_marks <span class="op">+=</span> marks
+        record[<span class="str">"total_marks"</span>]   <span class="op">=</span> total_marks
+        record[<span class="str">"average_marks"</span>] <span class="op">=</span> <span class="fn">round</span>(total_marks <span class="op">/</span> <span class="fn">len</span>(subjects), <span class="num">2</span>)
+        record[<span class="str">"Result"</span>] <span class="op">=</span> <span class="str">"Pass"</span> <span class="kw">if</span> <span class="fn">all</span>(
+            record[<span class="str">f"marks in {s}"</span>] <span class="op">&gt;=</span> <span class="num">28</span> <span class="kw">for</span> s <span class="kw">in</span> subjects
+        ) <span class="kw">else</span> <span class="str">"Fail"</span>
+        student_record.append(record)
 
-  <section id="contact">
-    <div class="section-label">05 // CONTACT</div>
-    <h2 class="section-title">Get In Touch</h2>
-    <div class="contact-wrapper">
-      <div class="contact-intro">
-        <p>I'm always open to connecting with fellow developers, cybersecurity enthusiasts, and anyone interested in technology and ethical hacking.</p>
-        <p>Whether you want to collaborate on a project, share resources, discuss cybersecurity topics, or just say hello — feel free to reach out!</p>
-        <p style="margin-top:1.5rem;font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--green);">Currently: <span style="color:var(--text);">Open to learning collaborations & mentorship</span></p>
-      </div>
-      <div class="contact-links">
-        <a href="mailto:animesh.sitoula09@gmail.com" class="contact-link"><span class="icon">✉</span><div><span class="contact-label">EMAIL</span>animesh.sitoula09@gmail.com</div></a>
-        <a href="https://github.com/animeshsitoula" target="_blank" class="contact-link"><span class="icon">⌥</span><div><span class="contact-label">GITHUB</span>github.com/animeshsitoula</div></a>
-        <a href="https://linkedin.com/in/animeshsitoula" target="_blank" class="contact-link"><span class="icon">◈</span><div><span class="contact-label">LINKEDIN</span>linkedin.com/in/animeshsitoula</div></a>
-        <a href="#" class="contact-link"><span class="icon">◉</span><div><span class="contact-label">LOCATION</span>Nepal 🇳🇵</div></a>
-      </div>
-    </div>
-  </section>
+    filename <span class="op">=</span> <span class="str">"student_record.json"</span>
+    data <span class="op">=</span> []
+    <span class="kw">if</span> os.path.exists(filename):
+        <span class="kw">with</span> <span class="fn">open</span>(filename, <span class="str">"r"</span>) <span class="kw">as</span> f:
+            <span class="kw">try</span>:    data <span class="op">=</span> j.load(f)
+            <span class="kw">except</span>: data <span class="op">=</span> []
+    data.extend(student_record)
+    <span class="kw">with</span> <span class="fn">open</span>(filename, <span class="str">"w"</span>) <span class="kw">as</span> f:
+        j.dump(data, f, indent<span class="op">=</span><span class="num">4</span>)
+    <span class="fn">print</span>(<span class="str">f"[+] {no_of_students} record(s) saved."</span>)
 
-  <footer>
-    <div>Designed &amp; built by <span>Animesh Sitoula</span> — 2025</div>
-    <div>Built with <span>HTML / CSS / JS</span> — No frameworks</div>
-  </footer>
+<span class="kw">def</span> <span class="fn">view_student_record</span>():
+    <span class="kw">if not</span> os.path.exists(<span class="str">"student_record.json"</span>):
+        <span class="fn">print</span>(<span class="str">"No records found."</span>); <span class="kw">return</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">"student_record.json"</span>, <span class="str">"r"</span>) <span class="kw">as</span> f:
+        data <span class="op">=</span> j.load(f)
+    <span class="kw">for</span> student <span class="kw">in</span> data:
+        <span class="fn">print</span>(<span class="str">"-"</span> <span class="op">*</span> <span class="num">35</span>)
+        <span class="kw">for</span> key, val <span class="kw">in</span> student.items():
+            <span class="fn">print</span>(<span class="str">f"  {key}: {val}"</span>)
+
+<span class="kw">def</span> <span class="fn">subj_wise_topper</span>():
+    <span class="kw">if not</span> os.path.exists(<span class="str">"student_record.json"</span>):
+        <span class="fn">print</span>(<span class="str">"No records found."</span>); <span class="kw">return</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">"student_record.json"</span>, <span class="str">"r"</span>) <span class="kw">as</span> f:
+        data <span class="op">=</span> j.load(f)
+    <span class="kw">for</span> student <span class="kw">in</span> data:
+        <span class="kw">for</span> subject <span class="kw">in</span> subjects:
+            <span class="kw">if</span> student[<span class="str">f"marks in {subject}"</span>] <span class="op">&gt;</span> subject_maximum_marks[subject]:
+                subject_maximum_marks[subject] <span class="op">=</span> student[<span class="str">f"marks in {subject}"</span>]
+                subject_topper[subject]        <span class="op">=</span> student[<span class="str">"name"</span>]
+    <span class="fn">print</span>(<span class="str">"\nSubject-wise Toppers:"</span>)
+    <span class="kw">for</span> subj <span class="kw">in</span> subject_topper:
+        <span class="fn">print</span>(<span class="str">f"  {subj.title()}: {subject_topper[subj]} ({subject_maximum_marks[subj]} marks)"</span>)
+
+<span class="kw">def</span> <span class="fn">class_rank</span>():
+    <span class="kw">if not</span> os.path.exists(<span class="str">"student_record.json"</span>):
+        <span class="fn">print</span>(<span class="str">"No records found."</span>); <span class="kw">return</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">"student_record.json"</span>, <span class="str">"r"</span>) <span class="kw">as</span> f:
+        data <span class="op">=</span> j.load(f)
+    ranked <span class="op">=</span> <span class="fn">sorted</span>(data, key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="str">"total_marks"</span>], reverse<span class="op">=</span><span class="kw">True</span>)
+    <span class="fn">print</span>(<span class="str">"\nClass Ranking:"</span>)
+    <span class="kw">for</span> i, s <span class="kw">in</span> <span class="fn">enumerate</span>(ranked, <span class="num">1</span>):
+        <span class="fn">print</span>(<span class="str">f"  {i}. {s['name']} &mdash; {s['total_marks']} marks  [{s['Result']}]"</span>)
+
+<span class="cm"># ===== MAIN MENU =====</span>
+<span class="kw">while True</span>:
+    <span class="fn">print</span>(<span class="str">"\n====== STUDENT PERFORMANCE ANALYTICS ======"</span>)
+    <span class="fn">print</span>(<span class="str">"1. Add student records"</span>)
+    <span class="fn">print</span>(<span class="str">"2. View all student reports"</span>)
+    <span class="fn">print</span>(<span class="str">"3. View subject-wise toppers"</span>)
+    <span class="fn">print</span>(<span class="str">"4. View class rank list"</span>)
+    <span class="fn">print</span>(<span class="str">"5. Exit"</span>)
+    <span class="kw">try</span>:
+        choice <span class="op">=</span> <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Enter choice: "</span>))
+    <span class="kw">except</span> <span class="cls">ValueError</span>:
+        <span class="fn">print</span>(<span class="str">"Enter a valid number."</span>); <span class="kw">continue</span>
+    <span class="kw">if</span>   choice <span class="op">==</span> <span class="num">1</span>:
+        <span class="kw">try</span>: <span class="fn">add_student_record</span>(<span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Number of students: "</span>)))
+        <span class="kw">except</span> <span class="cls">ValueError</span>: <span class="fn">print</span>(<span class="str">"Invalid input."</span>)
+    <span class="kw">elif</span> choice <span class="op">==</span> <span class="num">2</span>: <span class="fn">view_student_record</span>()
+    <span class="kw">elif</span> choice <span class="op">==</span> <span class="num">3</span>: <span class="fn">subj_wise_topper</span>()
+    <span class="kw">elif</span> choice <span class="op">==</span> <span class="num">4</span>: <span class="fn">class_rank</span>()
+    <span class="kw">elif</span> choice <span class="op">==</span> <span class="num">5</span>: <span class="fn">print</span>(<span class="str">"Goodbye!"</span>); <span class="kw">break</span>
+    <span class="kw">else</span>: <span class="fn">print</span>(<span class="str">"Invalid choice."</span>)</div>
+
+  <div id="code-tkinter" style="display:none"><span class="cm"># Python GUI Application &mdash; Tkinter Suite</span>
+<span class="cm"># by Animesh Sitoula</span>
+
+<span class="kw">import</span> <span class="cls">tkinter</span> <span class="kw">as</span> tk
+<span class="kw">from</span> <span class="cls">tkinter</span> <span class="kw">import</span> messagebox
+
+<span class="kw">class</span> <span class="cls">StudentApp</span>(<span class="cls">tk.Tk</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        <span class="fn">super</span>().<span class="fn">__init__</span>()
+        self.title(<span class="str">"Student Info Manager"</span>)
+        self.geometry(<span class="str">"520x400"</span>)
+        self.configure(bg<span class="op">=</span><span class="str">"#1e1e2e"</span>)
+        self.resizable(<span class="kw">False</span>, <span class="kw">False</span>)
+        self.records <span class="op">=</span> []
+        self.<span class="fn">_build_ui</span>()
+
+    <span class="kw">def</span> <span class="fn">_build_ui</span>(self):
+        hdr <span class="op">=</span> tk.Frame(self, bg<span class="op">=</span><span class="str">"#0d1117"</span>, pady<span class="op">=</span><span class="num">10</span>)
+        hdr.pack(fill<span class="op">=</span><span class="str">"x"</span>)
+        tk.Label(hdr, text<span class="op">=</span><span class="str">"STUDENT MANAGER"</span>,
+            font<span class="op">=</span>(<span class="str">"Courier"</span>, <span class="num">13</span>, <span class="str">"bold"</span>),
+            bg<span class="op">=</span><span class="str">"#0d1117"</span>, fg<span class="op">=</span><span class="str">"#00ff88"</span>).pack()
+
+        form <span class="op">=</span> tk.Frame(self, bg<span class="op">=</span><span class="str">"#1e1e2e"</span>, padx<span class="op">=</span><span class="num">30</span>, pady<span class="op">=</span><span class="num">15</span>)
+        form.pack(fill<span class="op">=</span><span class="str">"both"</span>, expand<span class="op">=</span><span class="kw">True</span>)
+
+        fields <span class="op">=</span> [(<span class="str">"Name"</span>, <span class="str">"name"</span>), (<span class="str">"Age"</span>, <span class="str">"age"</span>),
+                  (<span class="str">"Math Score"</span>, <span class="str">"math"</span>), (<span class="str">"English Score"</span>, <span class="str">"english"</span>)]
+        self.entries <span class="op">=</span> {}
+
+        <span class="kw">for</span> row, (label, key) <span class="kw">in</span> <span class="fn">enumerate</span>(fields):
+            tk.Label(form, text<span class="op">=</span><span class="str">f"{label}:"</span>,
+                font<span class="op">=</span>(<span class="str">"Courier"</span>, <span class="num">9</span>), bg<span class="op">=</span><span class="str">"#1e1e2e"</span>, fg<span class="op">=</span><span class="str">"#c9d1d9"</span>,
+                anchor<span class="op">=</span><span class="str">"w"</span>
+            ).grid(row<span class="op">=</span>row, column<span class="op">=</span><span class="num">0</span>, sticky<span class="op">=</span><span class="str">"w"</span>, pady<span class="op">=</span><span class="num">4</span>)
+            entry <span class="op">=</span> tk.Entry(form, width<span class="op">=</span><span class="num">28</span>, font<span class="op">=</span>(<span class="str">"Courier"</span>, <span class="num">9</span>),
+                bg<span class="op">=</span><span class="str">"#0d1520"</span>, fg<span class="op">=</span><span class="str">"#c9d1d9"</span>,
+                insertbackground<span class="op">=</span><span class="str">"#00ff88"</span>, relief<span class="op">=</span><span class="str">"flat"</span>)
+            entry.grid(row<span class="op">=</span>row, column<span class="op">=</span><span class="num">1</span>, padx<span class="op">=</span>(<span class="num">10</span>,<span class="num">0</span>), pady<span class="op">=</span><span class="num">4</span>)
+            self.entries[key] <span class="op">=</span> entry
+
+        btn_frame <span class="op">=</span> tk.Frame(self, bg<span class="op">=</span><span class="str">"#1e1e2e"</span>, pady<span class="op">=</span><span class="num">10</span>)
+        btn_frame.pack()
+        tk.Button(btn_frame, text<span class="op">=</span><span class="str">"ADD RECORD"</span>, command<span class="op">=</span>self.add_record,
+            bg<span class="op">=</span><span class="str">"#00ff88"</span>, fg<span class="op">=</span><span class="str">"#000"</span>, font<span class="op">=</span>(<span class="str">"Courier"</span>,<span class="num">9</span>,<span class="str">"bold"</span>),
+            relief<span class="op">=</span><span class="str">"flat"</span>, padx<span class="op">=</span><span class="num">12</span>, pady<span class="op">=</span><span class="num">6</span>
+        ).pack(side<span class="op">=</span><span class="str">"left"</span>, padx<span class="op">=</span><span class="num">5</span>)
+        tk.Button(btn_frame, text<span class="op">=</span><span class="str">"VIEW ALL"</span>, command<span class="op">=</span>self.view_records,
+            bg<span class="op">=</span><span class="str">"#0d1520"</span>, fg<span class="op">=</span><span class="str">"#00d4ff"</span>, font<span class="op">=</span>(<span class="str">"Courier"</span>,<span class="num">9</span>),
+            relief<span class="op">=</span><span class="str">"flat"</span>, padx<span class="op">=</span><span class="num">12</span>, pady<span class="op">=</span><span class="num">6</span>
+        ).pack(side<span class="op">=</span><span class="str">"left"</span>, padx<span class="op">=</span><span class="num">5</span>)
+
+        self.status <span class="op">=</span> tk.StringVar(value<span class="op">=</span><span class="str">"Ready."</span>)
+        tk.Label(self, textvariable<span class="op">=</span>self.status,
+            font<span class="op">=</span>(<span class="str">"Courier"</span>,<span class="num">8</span>), bg<span class="op">=</span><span class="str">"#0d1117"</span>,
+            fg<span class="op">=</span><span class="str">"#556070"</span>, anchor<span class="op">=</span><span class="str">"w"</span>, padx<span class="op">=</span><span class="num">10</span>
+        ).pack(fill<span class="op">=</span><span class="str">"x"</span>, side<span class="op">=</span><span class="str">"bottom"</span>)
+
+    <span class="kw">def</span> <span class="fn">add_record</span>(self):
+        vals <span class="op">=</span> {k: e.get().strip() <span class="kw">for</span> k, e <span class="kw">in</span> self.entries.items()}
+        <span class="kw">if not</span> <span class="fn">all</span>(vals.values()):
+            messagebox.showwarning(<span class="str">"Missing"</span>, <span class="str">"Fill all fields."</span>); <span class="kw">return</span>
+        <span class="kw">try</span>:
+            record <span class="op">=</span> {<span class="str">"name"</span>: vals[<span class="str">"name"</span>], <span class="str">"age"</span>: <span class="fn">int</span>(vals[<span class="str">"age"</span>]),
+                      <span class="str">"math"</span>: <span class="fn">int</span>(vals[<span class="str">"math"</span>]), <span class="str">"english"</span>: <span class="fn">int</span>(vals[<span class="str">"english"</span>])}
+        <span class="kw">except</span> <span class="cls">ValueError</span>:
+            messagebox.showerror(<span class="str">"Error"</span>, <span class="str">"Age and scores must be numbers."</span>); <span class="kw">return</span>
+        self.records.append(record)
+        self.status.set(<span class="str">f"Record added &mdash; {len(self.records)} total."</span>)
+        <span class="kw">for</span> e <span class="kw">in</span> self.entries.values(): e.delete(<span class="num">0</span>, <span class="str">"end"</span>)
+
+    <span class="kw">def</span> <span class="fn">view_records</span>(self):
+        <span class="kw">if not</span> self.records:
+            messagebox.showinfo(<span class="str">"Empty"</span>, <span class="str">"No records yet."</span>); <span class="kw">return</span>
+        win <span class="op">=</span> tk.Toplevel(self)
+        win.title(<span class="str">"All Records"</span>); win.configure(bg<span class="op">=</span><span class="str">"#0d1117"</span>)
+        txt <span class="op">=</span> tk.Text(win, font<span class="op">=</span>(<span class="str">"Courier"</span>,<span class="num">9</span>), bg<span class="op">=</span><span class="str">"#0d1520"</span>,
+                       fg<span class="op">=</span><span class="str">"#c9d1d9"</span>, padx<span class="op">=</span><span class="num">10</span>, pady<span class="op">=</span><span class="num">10</span>)
+        txt.pack(fill<span class="op">=</span><span class="str">"both"</span>, expand<span class="op">=</span><span class="kw">True</span>, padx<span class="op">=</span><span class="num">10</span>, pady<span class="op">=</span><span class="num">10</span>)
+        <span class="kw">for</span> r <span class="kw">in</span> self.records: txt.insert(<span class="str">"end"</span>, <span class="str">f"  {r}\n"</span>)
+        txt.config(state<span class="op">=</span><span class="str">"disabled"</span>)
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="str">"__main__"</span>:
+    <span class="cls">StudentApp</span>().mainloop()</div>
+
+  <div id="code-netmapper" style="display:none"><span class="cm"># Network Mapper &mdash; Multithreaded Host Discovery</span>
+<span class="cm"># by Animesh Sitoula</span>
+
+<span class="kw">import</span> <span class="cls">socket</span>, <span class="cls">subprocess</span>, <span class="cls">ipaddress</span>, <span class="cls">platform</span>
+<span class="kw">from</span> <span class="cls">concurrent.futures</span> <span class="kw">import</span> ThreadPoolExecutor, as_completed
+<span class="kw">from</span> <span class="cls">datetime</span> <span class="kw">import</span> datetime
+
+<span class="kw">def</span> <span class="fn">ping_host</span>(ip):
+    flag   <span class="op">=</span> <span class="str">"-n"</span> <span class="kw">if</span> platform.system() <span class="op">==</span> <span class="str">"Windows"</span> <span class="kw">else</span> <span class="str">"-c"</span>
+    result <span class="op">=</span> subprocess.run(
+        [<span class="str">"ping"</span>, flag, <span class="str">"1"</span>, <span class="str">"-W"</span>, <span class="str">"1"</span>, <span class="fn">str</span>(ip)],
+        stdout<span class="op">=</span>subprocess.DEVNULL, stderr<span class="op">=</span>subprocess.DEVNULL)
+    <span class="kw">return</span> ip <span class="kw">if</span> result.returncode <span class="op">==</span> <span class="num">0</span> <span class="kw">else None</span>
+
+<span class="kw">def</span> <span class="fn">resolve_host</span>(ip):
+    <span class="kw">try</span>:
+        hostname, _, _ <span class="op">=</span> socket.gethostbyaddr(<span class="fn">str</span>(ip))
+        <span class="kw">return</span> hostname
+    <span class="kw">except</span> socket.herror:
+        <span class="kw">return</span> <span class="str">"Unknown"</span>
+
+<span class="kw">def</span> <span class="fn">get_mac</span>(ip):
+    <span class="kw">try</span>:
+        out <span class="op">=</span> subprocess.<span class="fn">check_output</span>(
+            [<span class="str">"arp"</span>, <span class="str">"-n"</span>, <span class="fn">str</span>(ip)], stderr<span class="op">=</span>subprocess.DEVNULL).decode()
+        <span class="kw">for</span> line <span class="kw">in</span> out.splitlines()[<span class="num">1</span>:]:
+            parts <span class="op">=</span> line.split()
+            <span class="kw">if</span> <span class="fn">len</span>(parts) <span class="op">&gt;=</span> <span class="num">3</span>: <span class="kw">return</span> parts[<span class="num">2</span>]
+    <span class="kw">except Exception</span>: <span class="kw">pass</span>
+    <span class="kw">return</span> <span class="str">"N/A"</span>
+
+<span class="kw">def</span> <span class="fn">scan_network</span>(cidr, workers<span class="op">=</span><span class="num">64</span>):
+    <span class="fn">print</span>(<span class="str">f"\n[*] Scanning : {cidr}"</span>)
+    <span class="fn">print</span>(<span class="str">f"[*] Started  : {datetime.now().strftime('%H:%M:%S')}\n"</span>)
+    network <span class="op">=</span> ipaddress.<span class="fn">ip_network</span>(cidr, strict<span class="op">=</span><span class="kw">False</span>)
+    hosts   <span class="op">=</span> <span class="fn">list</span>(network.hosts())
+    active  <span class="op">=</span> []
+    <span class="kw">with</span> <span class="cls">ThreadPoolExecutor</span>(max_workers<span class="op">=</span>workers) <span class="kw">as</span> ex:
+        futures <span class="op">=</span> {ex.<span class="fn">submit</span>(ping_host, ip): ip <span class="kw">for</span> ip <span class="kw">in</span> hosts}
+        <span class="kw">for</span> fut <span class="kw">in</span> <span class="fn">as_completed</span>(futures):
+            ip <span class="op">=</span> fut.<span class="fn">result</span>()
+            <span class="kw">if</span> ip:
+                h   <span class="op">=</span> <span class="fn">resolve_host</span>(ip)
+                mac <span class="op">=</span> <span class="fn">get_mac</span>(ip)
+                active.append({<span class="str">"ip"</span>: <span class="fn">str</span>(ip), <span class="str">"hostname"</span>: h, <span class="str">"mac"</span>: mac})
+                <span class="fn">print</span>(<span class="str">f"  [+] {str(ip):<18} {h:<30} {mac}"</span>)
+    <span class="fn">print</span>(<span class="str">f"\n[*] Done &mdash; {len(active)} active device(s)."</span>)
+    <span class="kw">return</span> active
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="str">"__main__"</span>:
+    target <span class="op">=</span> <span class="fn">input</span>(<span class="str">"Enter CIDR (e.g. 192.168.1.0/24): "</span>).strip()
+    <span class="fn">scan_network</span>(target)</div>
+
+  <div id="code-portscanner" style="display:none"><span class="cm"># Port Scanner &mdash; TCP Service Detection</span>
+<span class="cm"># by Animesh Sitoula</span>
+
+<span class="kw">import</span> <span class="cls">socket</span>, <span class="cls">sys</span>, <span class="cls">json</span>
+<span class="kw">from</span> <span class="cls">concurrent.futures</span> <span class="kw">import</span> ThreadPoolExecutor, as_completed
+<span class="kw">from</span> <span class="cls">datetime</span> <span class="kw">import</span> datetime
+
+COMMON_PORTS <span class="op">=</span> {
+    <span class="num">21</span>:<span class="str">"FTP"</span>, <span class="num">22</span>:<span class="str">"SSH"</span>, <span class="num">23</span>:<span class="str">"Telnet"</span>, <span class="num">25</span>:<span class="str">"SMTP"</span>, <span class="num">53</span>:<span class="str">"DNS"</span>,
+    <span class="num">80</span>:<span class="str">"HTTP"</span>, <span class="num">110</span>:<span class="str">"POP3"</span>, <span class="num">143</span>:<span class="str">"IMAP"</span>, <span class="num">443</span>:<span class="str">"HTTPS"</span>,
+    <span class="num">3306</span>:<span class="str">"MySQL"</span>, <span class="num">3389</span>:<span class="str">"RDP"</span>, <span class="num">8080</span>:<span class="str">"HTTP-Alt"</span>
+}
+
+<span class="kw">def</span> <span class="fn">grab_banner</span>(ip, port):
+    <span class="kw">try</span>:
+        s <span class="op">=</span> socket.<span class="fn">socket</span>()
+        s.<span class="fn">settimeout</span>(<span class="num">1.5</span>)
+        s.<span class="fn">connect</span>((ip, port))
+        banner <span class="op">=</span> s.<span class="fn">recv</span>(<span class="num">1024</span>).decode(errors<span class="op">=</span><span class="str">"ignore"</span>).strip()
+        s.<span class="fn">close</span>()
+        <span class="kw">return</span> banner[:<span class="num">60</span>] <span class="kw">if</span> banner <span class="kw">else</span> <span class="str">"&mdash;"</span>
+    <span class="kw">except</span>: <span class="kw">return</span> <span class="str">"&mdash;"</span>
+
+<span class="kw">def</span> <span class="fn">scan_port</span>(ip, port):
+    <span class="kw">try</span>:
+        s  <span class="op">=</span> socket.<span class="fn">socket</span>(socket.AF_INET, socket.SOCK_STREAM)
+        s.<span class="fn">settimeout</span>(<span class="num">0.6</span>)
+        ok <span class="op">=</span> s.<span class="fn">connect_ex</span>((ip, port)) <span class="op">==</span> <span class="num">0</span>
+        s.<span class="fn">close</span>()
+        <span class="kw">if</span> ok:
+            svc    <span class="op">=</span> COMMON_PORTS.get(port, <span class="str">"Unknown"</span>)
+            banner <span class="op">=</span> <span class="fn">grab_banner</span>(ip, port)
+            <span class="kw">return</span> {<span class="str">"port"</span>: port, <span class="str">"service"</span>: svc, <span class="str">"banner"</span>: banner}
+    <span class="kw">except</span>: <span class="kw">pass</span>
+    <span class="kw">return None</span>
+
+<span class="kw">def</span> <span class="fn">run_scan</span>(target, port_range, workers<span class="op">=</span><span class="num">150</span>):
+    <span class="kw">try</span>: ip <span class="op">=</span> socket.<span class="fn">gethostbyname</span>(target)
+    <span class="kw">except</span>: <span class="fn">print</span>(<span class="str">"Cannot resolve target."</span>); sys.<span class="fn">exit</span>()
+    <span class="fn">print</span>(<span class="str">f"\n[*] Target  : {target} ({ip})"</span>)
+    <span class="fn">print</span>(<span class="str">f"[*] Started : {datetime.now().strftime('%H:%M:%S')}\n"</span>)
+    open_ports <span class="op">=</span> []
+    <span class="kw">with</span> <span class="cls">ThreadPoolExecutor</span>(workers) <span class="kw">as</span> ex:
+        futures <span class="op">=</span> {ex.<span class="fn">submit</span>(scan_port, ip, p): p <span class="kw">for</span> p <span class="kw">in</span> port_range}
+        <span class="kw">for</span> f <span class="kw">in</span> <span class="fn">as_completed</span>(futures):
+            res <span class="op">=</span> f.<span class="fn">result</span>()
+            <span class="kw">if</span> res:
+                open_ports.append(res)
+                <span class="fn">print</span>(<span class="str">f"  [OPEN] {res['port']:<6} {res['service']:<14} {res['banner']}"</span>)
+    open_ports.<span class="fn">sort</span>(key<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="str">"port"</span>])
+    <span class="fn">print</span>(<span class="str">f"\n[*] {len(open_ports)} open port(s) found."</span>)
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="str">"scan_results.json"</span>, <span class="str">"w"</span>) <span class="kw">as</span> f:
+        json.dump({<span class="str">"target"</span>: ip, <span class="str">"ports"</span>: open_ports}, f, indent<span class="op">=</span><span class="num">2</span>)
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="str">"__main__"</span>:
+    <span class="fn">run_scan</span>(<span class="fn">input</span>(<span class="str">"Target host: "</span>).strip(), <span class="fn">range</span>(<span class="num">1</span>, <span class="num">1025</span>))</div>
+
+  <div id="code-server" style="display:none"><span class="cm"># TCP Server &mdash; Client-Server Architecture</span>
+<span class="cm"># by Animesh Sitoula</span>
+
+<span class="kw">import</span> <span class="cls">socket</span>, <span class="cls">threading</span>
+
+HOST <span class="op">=</span> <span class="str">"0.0.0.0"</span>
+PORT <span class="op">=</span> <span class="num">9090</span>
+clients      <span class="op">=</span> {}
+clients_lock <span class="op">=</span> threading.Lock()
+
+<span class="kw">def</span> <span class="fn">broadcast</span>(msg, exclude<span class="op">=</span><span class="kw">None</span>):
+    <span class="kw">with</span> clients_lock:
+        <span class="kw">for</span> conn <span class="kw">in</span> clients:
+            <span class="kw">if</span> conn <span class="op">!=</span> exclude:
+                <span class="kw">try</span>: conn.<span class="fn">sendall</span>(msg.encode())
+                <span class="kw">except</span>: <span class="kw">pass</span>
+
+<span class="kw">def</span> <span class="fn">handle_client</span>(conn, addr):
+    <span class="fn">print</span>(<span class="str">f"[+] {addr} connected"</span>)
+    <span class="kw">try</span>:
+        conn.<span class="fn">sendall</span>(<span class="str">b"Enter your name: "</span>)
+        name <span class="op">=</span> conn.<span class="fn">recv</span>(<span class="num">64</span>).decode().strip() <span class="kw">or</span> <span class="str">f"User_{addr[1]}"</span>
+        <span class="kw">with</span> clients_lock: clients[conn] <span class="op">=</span> name
+        <span class="fn">broadcast</span>(<span class="str">f"[SERVER] {name} joined.\n"</span>, conn)
+        conn.<span class="fn">sendall</span>(<span class="str">f"[SERVER] Welcome {name}! Type quit to exit.\n"</span>.encode())
+        <span class="kw">while True</span>:
+            data <span class="op">=</span> conn.<span class="fn">recv</span>(<span class="num">1024</span>)
+            <span class="kw">if not</span> data: <span class="kw">break</span>
+            msg <span class="op">=</span> data.decode().strip()
+            <span class="kw">if</span> msg.lower() <span class="op">==</span> <span class="str">"quit"</span>: <span class="kw">break</span>
+            <span class="fn">print</span>(<span class="str">f"[{name}] {msg}"</span>)
+            <span class="fn">broadcast</span>(<span class="str">f"[{name}] {msg}\n"</span>, conn)
+    <span class="kw">except</span> <span class="cls">ConnectionResetError</span>: <span class="kw">pass</span>
+    <span class="kw">finally</span>:
+        <span class="kw">with</span> clients_lock: name <span class="op">=</span> clients.pop(conn, <span class="str">"Unknown"</span>)
+        conn.<span class="fn">close</span>()
+        <span class="fn">broadcast</span>(<span class="str">f"[SERVER] {name} left.\n"</span>)
+        <span class="fn">print</span>(<span class="str">f"[-] {name} disconnected"</span>)
+
+<span class="kw">def</span> <span class="fn">start_server</span>():
+    srv <span class="op">=</span> socket.<span class="fn">socket</span>(socket.AF_INET, socket.SOCK_STREAM)
+    srv.<span class="fn">setsockopt</span>(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="num">1</span>)
+    srv.<span class="fn">bind</span>((HOST, PORT)); srv.<span class="fn">listen</span>(<span class="num">10</span>)
+    <span class="fn">print</span>(<span class="str">f"[*] Listening on {HOST}:{PORT}"</span>)
+    <span class="kw">while True</span>:
+        conn, addr <span class="op">=</span> srv.<span class="fn">accept</span>()
+        threading.<span class="cls">Thread</span>(target<span class="op">=</span>handle_client,
+            args<span class="op">=</span>(conn, addr), daemon<span class="op">=</span><span class="kw">True</span>).<span class="fn">start</span>()
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="str">"__main__"</span>: <span class="fn">start_server</span>()</div>
+
+  <div id="code-client" style="display:none"><span class="cm"># TCP Client &mdash; Client-Server Architecture</span>
+<span class="cm"># by Animesh Sitoula</span>
+
+<span class="kw">import</span> <span class="cls">socket</span>, <span class="cls">threading</span>, <span class="cls">sys</span>
+
+HOST <span class="op">=</span> <span class="str">"127.0.0.1"</span>
+PORT <span class="op">=</span> <span class="num">9090</span>
+
+<span class="kw">def</span> <span class="fn">receive_messages</span>(sock):
+    <span class="kw">while True</span>:
+        <span class="kw">try</span>:
+            data <span class="op">=</span> sock.<span class="fn">recv</span>(<span class="num">1024</span>)
+            <span class="kw">if not</span> data:
+                <span class="fn">print</span>(<span class="str">"\n[!] Server closed connection."</span>); sys.<span class="fn">exit</span>()
+            <span class="fn">print</span>(data.decode(), end<span class="op">=</span><span class="str">""</span>, flush<span class="op">=</span><span class="kw">True</span>)
+        <span class="kw">except</span> <span class="cls">ConnectionResetError</span>:
+            <span class="fn">print</span>(<span class="str">"\n[!] Connection reset."</span>); sys.<span class="fn">exit</span>()
+        <span class="kw">except Exception</span> <span class="kw">as</span> e:
+            <span class="fn">print</span>(<span class="str">f"\n[!] Error: {e}"</span>); <span class="kw">break</span>
+
+<span class="kw">def</span> <span class="fn">start_client</span>():
+    sock <span class="op">=</span> socket.<span class="fn">socket</span>(socket.AF_INET, socket.SOCK_STREAM)
+    <span class="kw">try</span>:
+        sock.<span class="fn">connect</span>((HOST, PORT))
+        <span class="fn">print</span>(<span class="str">f"[*] Connected to {HOST}:{PORT}"</span>)
+    <span class="kw">except</span> <span class="cls">ConnectionRefusedError</span>:
+        <span class="fn">print</span>(<span class="str">"[!] Connection refused. Is server running?"</span>); sys.<span class="fn">exit</span>()
+
+    threading.<span class="cls">Thread</span>(target<span class="op">=</span>receive_messages,
+        args<span class="op">=</span>(sock,), daemon<span class="op">=</span><span class="kw">True</span>).<span class="fn">start</span>()
+    <span class="kw">try</span>:
+        <span class="kw">while True</span>:
+            msg <span class="op">=</span> <span class="fn">input</span>(<span class="str">""</span>)
+            <span class="kw">if not</span> msg: <span class="kw">continue</span>
+            sock.<span class="fn">sendall</span>(msg.encode())
+            <span class="kw">if</span> msg.lower() <span class="op">==</span> <span class="str">"quit"</span>: <span class="kw">break</span>
+    <span class="kw">except</span> (<span class="cls">KeyboardInterrupt</span>, <span class="cls">EOFError</span>): <span class="fn">print</span>(<span class="str">"\n[*] Disconnected."</span>)
+    <span class="kw">finally</span>: sock.<span class="fn">close</span>()
+
+<span class="kw">if</span> __name__ <span class="op">==</span> <span class="str">"__main__"</span>: <span class="fn">start_client</span>()</div>
+
+  <div id="code-cipher" style="display:none"><span class="cm">/* Cipher Encryption &mdash; C Language */</span>
+<span class="cm">/* by Animesh Sitoula */</span>
+
+<span class="kw">#include</span> <span class="str">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;string.h&gt;</span>
+<span class="kw">#include</span> <span class="str">&lt;ctype.h&gt;</span>
+<span class="kw">#define</span> <span class="vr">MAX</span>   <span class="num">256</span>
+<span class="kw">#define</span> <span class="vr">ALPHA</span> <span class="num">26</span>
+
+<span class="kw">void</span> <span class="fn">caesar</span>(<span class="kw">const char</span> *in, <span class="kw">char</span> *out, <span class="kw">int</span> shift) {
+    shift <span class="op">=</span> ((shift <span class="op">%</span> <span class="vr">ALPHA</span>) <span class="op">+</span> <span class="vr">ALPHA</span>) <span class="op">%</span> <span class="vr">ALPHA</span>;
+    <span class="kw">int</span> n <span class="op">=</span> <span class="fn">strlen</span>(in);
+    <span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">0</span>; i <span class="op">&lt;</span> n; i<span class="op">++</span>) {
+        <span class="kw">char</span> c <span class="op">=</span> in[i];
+        <span class="kw">if</span>      (<span class="fn">isupper</span>(c)) out[i] <span class="op">=</span> (c <span class="op">-</span> <span class="str">'A'</span> <span class="op">+</span> shift) <span class="op">%</span> <span class="vr">ALPHA</span> <span class="op">+</span> <span class="str">'A'</span>;
+        <span class="kw">else if</span> (<span class="fn">islower</span>(c)) out[i] <span class="op">=</span> (c <span class="op">-</span> <span class="str">'a'</span> <span class="op">+</span> shift) <span class="op">%</span> <span class="vr">ALPHA</span> <span class="op">+</span> <span class="str">'a'</span>;
+        <span class="kw">else</span>                  out[i] <span class="op">=</span> c;
+    }
+    out[n] <span class="op">=</span> <span class="str">'\0'</span>;
+}
+
+<span class="kw">void</span> <span class="fn">print_hex</span>(<span class="kw">const char</span> *s) {
+    <span class="fn">printf</span>(<span class="str">"Hex: "</span>);
+    <span class="kw">for</span> (<span class="kw">int</span> i <span class="op">=</span> <span class="num">0</span>; s[i]; i<span class="op">++</span>)
+        <span class="fn">printf</span>(<span class="str">"%02x "</span>, (<span class="kw">unsigned char</span>)s[i]);
+    <span class="fn">printf</span>(<span class="str">"\n"</span>);
+}
+
+<span class="kw">int</span> <span class="fn">main</span>() {
+    <span class="kw">char</span> plain[<span class="vr">MAX</span>], enc[<span class="vr">MAX</span>], dec[<span class="vr">MAX</span>];
+    <span class="kw">int</span>  shift;
+    <span class="fn">printf</span>(<span class="str">"Plaintext : "</span>);
+    <span class="fn">fgets</span>(plain, <span class="vr">MAX</span>, stdin);
+    plain[<span class="fn">strcspn</span>(plain, <span class="str">"\n"</span>)] <span class="op">=</span> <span class="num">0</span>;
+    <span class="fn">printf</span>(<span class="str">"Shift key : "</span>);
+    <span class="fn">scanf</span>(<span class="str">"%d"</span>, &amp;shift);
+    <span class="fn">caesar</span>(plain, enc,  shift);
+    <span class="fn">caesar</span>(enc,   dec, <span class="op">-</span>shift);
+    <span class="fn">printf</span>(<span class="str">"Original  : %s\n"</span>, plain);
+    <span class="fn">printf</span>(<span class="str">"Encrypted : %s\n"</span>, enc);
+    <span class="fn">printf</span>(<span class="str">"Decrypted : %s\n"</span>, dec);
+    <span class="fn">print_hex</span>(enc);
+    <span class="kw">return</span> <span class="num">0</span>;
+}</div>
+
+  <div id="code-kali" style="display:none"><span class="cm">#!/usr/bin/env bash</span>
+<span class="cm"># Kali Linux Security Environment Setup</span>
+<span class="cm"># by Animesh Sitoula</span>
+set -e
+
+LOG<span class="op">=</span><span class="str">"/tmp/kali_setup.log"</span>
+WS<span class="op">=</span><span class="str">"$HOME/security-lab"</span>
+
+<span class="fn">log</span>() { echo <span class="str">"[$(date +%H:%M:%S)] $*"</span> | tee -a <span class="str">"$LOG"</span>; }
+
+<span class="fn">log</span> <span class="str">"Starting Kali setup..."</span>
+sudo apt update -qq &amp;&amp; sudo apt upgrade -y -qq
+
+TOOLS=(nmap wireshark netcat-openbsd hydra john sqlmap dirb gobuster)
+<span class="fn">log</span> <span class="str">"Installing ${#TOOLS[@]} security tools..."</span>
+sudo apt install -y -qq <span class="str">"${TOOLS[@]}"</span>
+
+<span class="kw">for</span> dir <span class="kw">in</span> scans exploits reports notes loot wordlists; <span class="kw">do</span>
+    mkdir -p <span class="str">"$WS/$dir"</span>
+<span class="kw">done</span>
+<span class="fn">log</span> <span class="str">"Workspace ready: $WS"</span>
+
+<span class="fn">log</span> <span class="str">"Network interfaces:"</span>
+ip -br addr show | tee -a <span class="str">"$LOG"</span>
+GW<span class="op">=</span>$(ip route | awk <span class="str">'/default/{print $3}'</span>)
+<span class="fn">log</span> <span class="str">"Default gateway: $GW"</span>
+
+<span class="fn">log</span> <span class="str">"Running localhost nmap scan..."</span>
+nmap -sV -T4 -oN <span class="str">"$WS/scans/localhost.txt"</span> 127.0.0.1
+
+echo <span class="str">"===== SYSTEM SUMMARY ====="</span>
+echo <span class="str">"Kernel : $(uname -r)"</span>
+echo <span class="str">"OS     : $(lsb_release -d | cut -f2)"</span>
+echo <span class="str">"Uptime : $(uptime -p)"</span>
+<span class="fn">log</span> <span class="str">"Setup complete. Happy ethical hacking!"</span></div>
 
   <script>
-    var dot  = document.getElementById('gCursor');
-    var ring = document.getElementById('gRing');
-    var mx = 0, my = 0, rx = 0, ry = 0;
+  /* ===== CURSOR ===== */
+  var cur = document.getElementById('cur');
+  var ring = document.getElementById('cur-ring');
+  var mx = 0, my = 0, rx = 0, ry = 0;
 
-    document.addEventListener('mousemove', function(e) {
-      mx = e.clientX;
-      my = e.clientY;
-      dot.style.left = mx + 'px';
-      dot.style.top  = my + 'px';
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX; my = e.clientY;
+    cur.style.left = mx + 'px';
+    cur.style.top  = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.1;
+    ry += (my - ry) * 0.1;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a, button, .stat-card, .project-card, .panel').forEach(function(el) {
+    el.addEventListener('mouseenter', function() { document.body.classList.add('chover'); });
+    el.addEventListener('mouseleave', function() { document.body.classList.remove('chover'); });
+  });
+
+  /* ===== SCROLL FADE ===== */
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
     });
+  }, { threshold: 0.07 });
 
-    function loopRing() {
-      rx += (mx - rx) * 0.13;
-      ry += (my - ry) * 0.13;
-      ring.style.left = rx + 'px';
-      ring.style.top  = ry + 'px';
-      requestAnimationFrame(loopRing);
-    }
-    loopRing();
+  document.querySelectorAll('.project-card,.skill-group,.stat-card,.roadmap-item,.contact-link,.skill-bar-item,.ongoing-item').forEach(function(el) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+    obs.observe(el);
+  });
 
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(e) {
-        if (e.isIntersecting) {
-          e.target.style.opacity = '1';
-          e.target.style.transform = 'translateY(0)';
-        }
+  /* ===== ACTIVE NAV ===== */
+  var secs = document.querySelectorAll('section[id]');
+  var navs = document.querySelectorAll('.sidenav-links a');
+  window.addEventListener('scroll', function() {
+    var sy = window.scrollY + 200;
+    secs.forEach(function(s) {
+      if (sy >= s.offsetTop && sy < s.offsetTop + s.offsetHeight) {
+        navs.forEach(function(a) { a.classList.remove('active'); });
+        var l = document.querySelector('.sidenav-links a[href="#' + s.id + '"]');
+        if (l) l.classList.add('active');
+      }
+    });
+  });
+
+  /* ===== SKILL BARS ===== */
+  var barsDone = {};
+  function animBars(id) {
+    if (barsDone[id]) return;
+    barsDone[id] = true;
+    document.querySelectorAll('#' + id + ' .skill-bar-fill').forEach(function(b, i) {
+      setTimeout(function() { b.style.width = b.dataset.w + '%'; }, i * 110 + 80);
+    });
+  }
+  ['skillBars', 'skillBars2'].forEach(function(id) {
+    var el = document.getElementById(id); if (!el) return;
+    new IntersectionObserver(function(e) { if (e[0].isIntersecting) animBars(id); }, { threshold: 0.15 }).observe(el);
+  });
+
+  /* ===== CODE MODAL — reads from hidden divs, no JS string issues ===== */
+  var snippetMeta = {
+    student:     { title: 'student_performance.py', tabs: null },
+    tkinter:     { title: 'gui_app.py',             tabs: null },
+    netmapper:   { title: 'network_mapper.py',      tabs: null },
+    portscanner: { title: 'port_scanner.py',        tabs: null },
+    server:      { title: 'server.py',   tabs: [{id:'server',label:'server.py'},{id:'client',label:'client.py'}] },
+    client:      { title: 'client.py',   tabs: [{id:'server',label:'server.py'},{id:'client',label:'client.py'}] },
+    cipher:      { title: 'cipher_encrypt.c', tabs: null },
+    kali:        { title: 'kali_setup.sh',    tabs: null }
+  };
+
+  function openCode(key) {
+    var meta = snippetMeta[key]; if (!meta) return;
+    var src  = document.getElementById('code-' + key); if (!src) return;
+
+    var tabBar = document.getElementById('codeTabsBar');
+    tabBar.innerHTML = '';
+    if (meta.tabs) {
+      tabBar.style.display = 'flex';
+      meta.tabs.forEach(function(t) {
+        var btn = document.createElement('button');
+        btn.className = 'code-tab' + (t.id === key ? ' active' : '');
+        btn.textContent = t.label;
+        btn.onclick = function() { openCode(t.id); };
+        tabBar.appendChild(btn);
       });
-    }, { threshold: 0.1 });
+    } else {
+      tabBar.style.display = 'none';
+    }
 
-    document.querySelectorAll('.project-card, .skill-group, .stat-card, .roadmap-item, .contact-link').forEach(function(el) {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(20px)';
-      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease, border-color 0.2s, box-shadow 0.2s';
-      observer.observe(el);
-    });
+    document.getElementById('modalTitle').textContent = meta.title;
+    document.getElementById('modalCode').innerHTML = src.innerHTML;
+    document.getElementById('codeModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCode() {
+    document.getElementById('codeModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('codeModal').addEventListener('click', function(e) {
+    if (e.target === this) closeCode();
+  });
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeCode(); });
+  document.addEventListener('copy', function(e) {
+    if (e.target.closest('pre')) { e.preventDefault(); e.clipboardData.setData('text/plain', '[Read-only]'); }
+  });
+  document.addEventListener('contextmenu', function(e) {
+    if (e.target.closest('pre')) e.preventDefault();
+  });
   </script>
-
 </body>
 </html>
